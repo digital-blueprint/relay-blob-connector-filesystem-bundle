@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Dbp\Relay\BlobConnectorLocalBundle\Service;
+
+use Dbp\Relay\BlobBundle\Entity\Bucket;
+use Symfony\Component\HttpFoundation\UrlHelper;
+
+class ConfigurationService
+{
+    /**
+     * @var array
+     */
+    private $config = [];
+
+    /**
+     * @var UrlHelper
+     */
+    private $urlHelper;
+
+    public function __construct(
+        UrlHelper $urlHelper
+    ) {
+        $this->urlHelper = $urlHelper;
+    }
+
+    /**
+     * @return void
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
+    }
+
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    public function getPath(): string
+    {
+        return $this->config['path'];
+    }
+}
