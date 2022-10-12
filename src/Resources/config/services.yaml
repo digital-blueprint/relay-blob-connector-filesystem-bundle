@@ -2,3 +2,4 @@ services:
   Dbp\Relay\BlobConnectorLocalBundle\Service\LocalDataSystemService:
     autowire: true
     autoconfigure: true
+    public: true
