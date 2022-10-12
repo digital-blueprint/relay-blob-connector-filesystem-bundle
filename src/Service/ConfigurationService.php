@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorLocalBundle\Service;
 
-use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Symfony\Component\HttpFoundation\UrlHelper;
 
 class ConfigurationService

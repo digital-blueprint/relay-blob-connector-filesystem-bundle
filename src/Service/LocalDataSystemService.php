@@ -7,12 +7,11 @@ namespace Dbp\Relay\BlobConnectorLocalBundle\Service;
 use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
+use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
-
 
 class LocalDataSystemService implements DatasystemProviderServiceInterface
 {
@@ -37,12 +36,12 @@ class LocalDataSystemService implements DatasystemProviderServiceInterface
 
     public function saveFile(FileData &$fileData): ?FileData
     {
-       /* try {
-            $this->em->persist($fileData);
-            $this->em->flush();
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'File could not be created!', 'blob:form-not-created', ['message' => $e->getMessage()]);
-        }
+        /* try {
+             $this->em->persist($fileData);
+             $this->em->flush();
+         } catch (\Exception $e) {
+             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'File could not be created!', 'blob:form-not-created', ['message' => $e->getMessage()]);
+         }
 */
         return $fileData;
     }
