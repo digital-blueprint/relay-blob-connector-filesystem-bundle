@@ -181,7 +181,13 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-blob-bundle.git",
-                "reference": "d1eddc860857a8bb116c2a25fa33aecc4aec4369"
+                "reference": "532e8a4bbeebc2a0d1b421d6aa1cf043057f70ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-blob-bundle/repository/archive.zip?sha=532e8a4bbeebc2a0d1b421d6aa1cf043057f70ed",
+                "reference": "532e8a4bbeebc2a0d1b421d6aa1cf043057f70ed",
+                "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6",
@@ -245,7 +251,11 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "A bundle for fileserving, persisting and managing",
-            "time": "2022-10-12T13:49:42+00:00"
+            "support": {
+                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/tree/main",
+                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/issues"
+            },
+            "time": "2022-10-15T00:08:44+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
@@ -1535,20 +1545,20 @@
         },
         {
             "name": "doctrine/persistence",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/persistence.git",
-                "reference": "ac6fce61f037d7e54dbb2435f5b5648d86548e23"
+                "reference": "05612da375f8a3931161f435f91d6704926e6ec5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/persistence/zipball/ac6fce61f037d7e54dbb2435f5b5648d86548e23",
-                "reference": "ac6fce61f037d7e54dbb2435f5b5648d86548e23",
+                "url": "https://api.github.com/repos/doctrine/persistence/zipball/05612da375f8a3931161f435f91d6704926e6ec5",
+                "reference": "05612da375f8a3931161f435f91d6704926e6ec5",
                 "shasum": ""
             },
             "require": {
-                "doctrine/event-manager": "^1.0",
+                "doctrine/event-manager": "^1 || ^2",
                 "php": "^7.2 || ^8.0",
                 "psr/cache": "^1.0 || ^2.0 || ^3.0"
             },
@@ -1559,14 +1569,14 @@
             "require-dev": {
                 "composer/package-versions-deprecated": "^1.11",
                 "doctrine/annotations": "^1.7",
-                "doctrine/coding-standard": "^9.0",
+                "doctrine/coding-standard": "^10",
                 "doctrine/common": "^3.0",
-                "phpstan/phpstan": "1.5.0",
+                "phpstan/phpstan": "1.8.8",
                 "phpstan/phpstan-phpunit": "^1",
                 "phpstan/phpstan-strict-rules": "^1.1",
                 "phpunit/phpunit": "^8.5 || ^9.5",
                 "symfony/cache": "^4.4 || ^5.4 || ^6.0",
-                "vimeo/psalm": "4.22.0"
+                "vimeo/psalm": "4.29.0"
             },
             "type": "library",
             "autoload": {
@@ -1615,7 +1625,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/persistence/issues",
-                "source": "https://github.com/doctrine/persistence/tree/3.0.3"
+                "source": "https://github.com/doctrine/persistence/tree/3.0.4"
             },
             "funding": [
                 {
@@ -1631,7 +1641,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-08-04T21:14:21+00:00"
+            "time": "2022-10-13T07:34:14+00:00"
         },
         {
             "name": "doctrine/sql-formatter",
