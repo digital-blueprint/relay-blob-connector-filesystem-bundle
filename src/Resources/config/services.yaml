@@ -3,3 +3,7 @@ services:
     autowire: true
     autoconfigure: true
     public: true
+
+  Dbp\Relay\BlobConnectorLocalBundle\Service\ConfigurationService:
+    autowire: true
+    autoconfigure: true

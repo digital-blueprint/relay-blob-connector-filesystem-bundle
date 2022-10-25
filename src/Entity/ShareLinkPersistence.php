@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorLocalBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dbp\Relay\BlobBundle\Entity\FileData;
 
 /**
  * @ORM\Entity
@@ -20,8 +21,8 @@ class ShareLinkPersistence
     private $identifier;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(type="datetime", nullable=true)
+     * @var \DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable")
      */
     private $validUntil;
 
@@ -33,7 +34,7 @@ class ShareLinkPersistence
 
     /**
      * @var string
-     * @ORM\Column(type="string")
+     * @ORM\Column(name="file_data_identifier", type="string")
      */
     private $fileDataIdentifier;
 
@@ -53,12 +54,12 @@ class ShareLinkPersistence
         $this->identifier = $identifier;
     }
 
-    public function getValidUntil(): \DateTime
+    public function getValidUntil(): \DateTimeImmutable
     {
         return $this->validUntil;
     }
 
-    public function setValidUntil(\DateTime $validUntil): void
+    public function setValidUntil(\DateTimeImmutable $validUntil): void
     {
         $this->validUntil = $validUntil;
     }

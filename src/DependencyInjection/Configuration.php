@@ -16,8 +16,17 @@ class Configuration implements ConfigurationInterface
         $treeBuilder
             ->getRootNode()
                 ->children()
+                    ->scalarNode('database_url')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                        ->defaultValue('%env(resolve:DATABASE_URL)%')
+                    ->end()
                     ->scalarNode('path')
-                        ->defaultValue('/blobFiles')
+                        ->defaultValue('blobFiles')
+                    ->end()
+                    ->scalarNode('linkUrl')
+                    ->end()
+                    ->scalarNode('linkExpireTime')
                     ->end()
                 ->end()
             ->end();
