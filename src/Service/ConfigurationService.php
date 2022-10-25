@@ -41,4 +41,13 @@ class ConfigurationService
     {
         return $this->config['path'];
     }
+
+    public function getLinkUrl(): string{
+        return $this->config['linkUrl'];
+    }
+
+    public function getLinkExpireTime(): string
+    {
+        return $this->config['linkExpireTime'];
+    }
 }
