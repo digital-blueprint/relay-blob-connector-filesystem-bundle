@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Create table blob_connector_local
+ * Create table blob_connector_local.
  */
 final class Version20221024082730 extends AbstractMigration
 {

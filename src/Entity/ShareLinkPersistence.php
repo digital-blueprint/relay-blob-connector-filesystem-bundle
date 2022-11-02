@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Dbp\Relay\BlobBundle\Entity\FileData;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="blob_connector_filesystem")
