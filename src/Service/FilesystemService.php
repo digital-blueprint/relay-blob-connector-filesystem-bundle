@@ -11,10 +11,10 @@ use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\TextUI\XmlConfiguration\File;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
 
 class FilesystemService implements DatasystemProviderServiceInterface
@@ -29,7 +29,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private $configurationService;
 
-
     /**
      * @var SluggerInterface
      */
@@ -37,7 +36,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private $targetDirectory;
 
-    public function __construct(EntityManagerInterface $em,  ConfigurationService $configurationService,  SluggerInterface $slugger)
+    public function __construct(EntityManagerInterface $em, ConfigurationService $configurationService, SluggerInterface $slugger)
     {
         $this->configurationService = $configurationService;
         $this->em = $em;
@@ -53,7 +52,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
     {
         $shareLink = new ShareLinkPersistence();
 
-
         /** @var ?UploadedFile $uploadedFile */
         $uploadedFile = $fileData->getFile();
         $folder = substr($fileData->getIdentifier(), 0, 2);
@@ -61,11 +59,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $safeFilename = $this->slugger->slug($id);
         $newFilename = $safeFilename.'.'.$uploadedFile->guessExtension();
         $destination = $this->configurationService->getPath();
-        if (substr($destination, -1) != '/') {
+        if (substr($destination, -1) !== '/') {
             $destination .= '/';
         }
         $destination .= $fileData->getBucket()->getPath();
-        if (substr($destination, -1) != '/') {
+        if (substr($destination, -1) !== '/') {
             $destination .= '/';
         }
         $destination .= $folder;
@@ -75,7 +73,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (FileException $e) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error');
         }
-
 
         /* Move File from images to copyImages folder*/
 
@@ -101,6 +98,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'ShareLink could not be saved!', 'blob-connector-filesystem:sharelink-not-saved', ['message' => $e->getMessage()]);
         }
+
         return $fileData;
     }
 
@@ -132,6 +130,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     private function generateContentUrl(string $id): string
     {
         $link = $this->configurationService->getLinkUrl();
+
         return $link.'blob/'.$id;
     }
 }
