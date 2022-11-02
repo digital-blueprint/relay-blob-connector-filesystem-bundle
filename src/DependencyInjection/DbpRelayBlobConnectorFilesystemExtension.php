@@ -61,7 +61,7 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
                             'dbp_relay_blob_connector_filesystem_bundle' => [
                                 'type' => 'annotation',
                                 'dir' => __DIR__.'/../Entity',
-                                'prefix' => 'Dbp\Relay\BlobConnectorfilesystemBundle\Entity',
+                                'prefix' => 'Dbp\Relay\BlobConnectorFilesystemBundle\Entity',
                             ],
                         ],
                     ],
