@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BlobConnectorLocalBundle\Migrations;
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class EntityManagerMigration extends AbstractMigration implements ContainerAwareInterface
 {
-    private const EM_NAME = 'dbp_relay_blob_connector_local_bundle';
+    private const EM_NAME = 'dbp_relay_blob_connector_filesystem_bundle';
 
     /** @var ContainerInterface */
     protected $container;

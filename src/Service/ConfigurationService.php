@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BlobConnectorLocalBundle\Service;
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Symfony\Component\HttpFoundation\UrlHelper;
 

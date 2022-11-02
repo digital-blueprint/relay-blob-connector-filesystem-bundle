@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BlobConnectorLocalBundle\Service;
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
-use Dbp\Relay\BlobConnectorLocalBundle\Entity\ShareLinkPersistence;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\TextUI\XmlConfiguration\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\Uuid;
 
-class LocalDataSystemService implements DatasystemProviderServiceInterface
+class FilesystemService implements DatasystemProviderServiceInterface
 {
     /**
      * @var EntityManagerInterface
@@ -72,20 +73,18 @@ class LocalDataSystemService implements DatasystemProviderServiceInterface
         try {
             $uploadedFile->move($destination, $newFilename);
         } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-local:save-file-error');
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error');
         }
 
 
-        /* Move File from images to copyImages folder
-
-        if( !rename($uploadedFile, $destinationFilePath) ) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-local:save-file-error');
-        }*/
+        /* Move File from images to copyImages folder*/
 
         //generate link
-        $contentUrl = $this->generateContentUrl();
+        $shareLinkId = (string) Uuid::v4();
+        $contentUrl = $this->generateContentUrl($shareLinkId);
         $fileData->setContentUrl($contentUrl);
 
+        $shareLink->setIdentifier($shareLinkId);
         $shareLink->setFileDataIdentifier($id);
         $shareLink->setLink($contentUrl);
 
@@ -100,7 +99,7 @@ class LocalDataSystemService implements DatasystemProviderServiceInterface
             $this->em->persist($shareLink);
             $this->em->flush();
         } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'ShareLink could not be saved!', 'blob-connector-local:sharelink-not-saved', ['message' => $e->getMessage()]);
+            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'ShareLink could not be saved!', 'blob-connector-filesystem:sharelink-not-saved', ['message' => $e->getMessage()]);
         }
         return $fileData;
     }
@@ -130,11 +129,9 @@ class LocalDataSystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
-    private function generateContentUrl(): string
+    private function generateContentUrl(string $id): string
     {
         $link = $this->configurationService->getLinkUrl();
-        $hash = bin2hex(random_bytes(22));
-        //TODO check hash exists
-        return $link.'blob/'.$hash;
+        return $link.'blob/'.$id;
     }
 }
