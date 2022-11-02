@@ -88,7 +88,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // Create a valid until date
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $linkExpireTime = $this->configurationService->getLinkExpireTime();
-        $validUntil = $now->add(new \DateInterval('PT'.$linkExpireTime));
+        $validUntil = $now->add(new \DateInterval($linkExpireTime));
         $shareLink->setValidUntil($validUntil); //get valid out from config
 
         //save data to database

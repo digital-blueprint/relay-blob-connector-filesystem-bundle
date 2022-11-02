@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('linkUrl')
                     ->end()
                     ->scalarNode('linkExpireTime')
+                        ->isRequired()
                     ->end()
                 ->end()
             ->end();
