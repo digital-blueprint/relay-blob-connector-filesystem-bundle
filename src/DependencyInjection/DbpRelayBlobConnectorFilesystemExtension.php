@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BlobConnectorLocalBundle\DependencyInjection;
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\DependencyInjection;
 
-use Dbp\Relay\BlobConnectorLocalBundle\Service\ConfigurationService;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\CoreBundle\Extension\ExtensionTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
-class DbpRelayBlobConnectorLocalExtension extends ConfigurableExtension implements PrependExtensionInterface
+class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension implements PrependExtensionInterface
 {
     use ExtensionTrait;
 
@@ -47,21 +47,21 @@ class DbpRelayBlobConnectorLocalExtension extends ConfigurableExtension implemen
         $container->prependExtensionConfig('doctrine', [
             'dbal' => [
                 'connections' => [
-                    'dbp_relay_blob_connector_local_bundle' => [
+                    'dbp_relay_blob_connector_filesystem_bundle' => [
                         'url' => $config['database_url'] ?? '',
                     ],
                 ],
             ],
             'orm' => [
                 'entity_managers' => [
-                    'dbp_relay_blob_connector_local_bundle' => [
+                    'dbp_relay_blob_connector_filesystem_bundle' => [
                         'naming_strategy' => 'doctrine.orm.naming_strategy.underscore_number_aware',
-                        'connection' => 'dbp_relay_blob_connector_local_bundle',
+                        'connection' => 'dbp_relay_blob_connector_filesystem_bundle',
                         'mappings' => [
-                            'dbp_relay_blob_connector_local_bundle' => [
+                            'dbp_relay_blob_connector_filesystem_bundle' => [
                                 'type' => 'annotation',
                                 'dir' => __DIR__.'/../Entity',
-                                'prefix' => 'Dbp\Relay\BlobConnectorLocalBundle\Entity',
+                                'prefix' => 'Dbp\Relay\BlobConnectorfilesystemBundle\Entity',
                             ],
                         ],
                     ],
@@ -69,11 +69,11 @@ class DbpRelayBlobConnectorLocalExtension extends ConfigurableExtension implemen
             ],
         ]);
 
-        $this->registerEntityManager($container, 'dbp_relay_blob_connector_local_bundle');
+        $this->registerEntityManager($container, 'dbp_relay_blob_connector_filesystem_bundle');
 
         $container->prependExtensionConfig('doctrine_migrations', [
             'migrations_paths' => [
-                'Dbp\Relay\BlobConnectorLocalBundle\Migrations' => __DIR__.'/../Migrations',
+                'Dbp\Relay\BlobConnectorFilesystemBundle\Migrations' => __DIR__.'/../Migrations',
             ],
         ]);
     }

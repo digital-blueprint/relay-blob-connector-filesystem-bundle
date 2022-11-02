@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BlobConnectorLocalBundle\Tests;
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
-use Dbp\Relay\BlobConnectorLocalBundle\DbpRelayBlobConnectorLocalBundle;
+use Dbp\Relay\BlobConnectorFilesystemBundle\DbpRelayBlobConnectorFilesystemBundle;
 use Dbp\Relay\CoreBundle\DbpRelayCoreBundle;
 use Nelmio\CorsBundle\NelmioCorsBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -30,7 +30,7 @@ class Kernel extends BaseKernel
         yield new NelmioCorsBundle();
         yield new MonologBundle();
         yield new ApiPlatformBundle();
-        yield new DbpRelayBlobConnectorLocalBundle();
+        yield new DbpRelayBlobConnectorFilesystemBundle();
         yield new DbpRelayCoreBundle();
     }
 
@@ -47,6 +47,6 @@ class Kernel extends BaseKernel
             'secret' => '',
         ]);
 
-        $container->extension('dbp_relay_blob_connector_local', []);
+        $container->extension('dbp_relay_blob_connector_filesystem', []);
     }
 }

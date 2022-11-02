@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BlobConnectorLocalBundle\Entity;
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="blob_connector_local")
+ * @ORM\Table(name="blob_connector_filesystem")
  */
 class ShareLinkPersistence
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=50)
      */
     private $identifier;
 

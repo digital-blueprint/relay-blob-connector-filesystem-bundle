@@ -1,5 +1,5 @@
 {
-    "name": "dbp/relay-blob-connector-local-bundle",
+    "name": "dbp/relay-blob-connector-filesystem-bundle",
     "description": "A template bundle for the Relay API gateway",
     "type": "symfony-bundle",
     "license": "AGPL-3.0-or-later",
@@ -31,12 +31,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Dbp\\Relay\\BlobConnectorLocalBundle\\": "src/"
+            "Dbp\\Relay\\BlobConnectorFilesystemBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dbp\\Relay\\BlobConnectorLocalBundle\\Tests\\": "tests/"
+            "Dbp\\Relay\\BlobConnectorFilesystemBundle\\Tests\\": "tests/"
         }
     },
     "config": {

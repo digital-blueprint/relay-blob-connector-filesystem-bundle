@@ -1,9 +1,9 @@
 services:
-  Dbp\Relay\BlobConnectorLocalBundle\Service\LocalDataSystemService:
+  Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService:
     autowire: true
     autoconfigure: true
     public: true
 
-  Dbp\Relay\BlobConnectorLocalBundle\Service\ConfigurationService:
+  Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService:
     autowire: true
     autoconfigure: true
