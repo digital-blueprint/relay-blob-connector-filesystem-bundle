@@ -4,6 +4,17 @@ services:
     autoconfigure: true
     public: true
 
+  Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService:
+    autowire: true
+    autoconfigure: true
+    public: true
+
   Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService:
+    autowire: true
+    autoconfigure: true
+
+  Dbp\Relay\BlobConnectorFilesystemBundle\Controller\:
+    tags: [ 'controller.service_arguments' ]
+    resource: '../../Controller'
     autowire: true
     autoconfigure: true

@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\File;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -36,6 +37,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private $targetDirectory;
 
+
+
     public function __construct(EntityManagerInterface $em, ConfigurationService $configurationService, SluggerInterface $slugger)
     {
         $this->configurationService = $configurationService;
@@ -50,46 +53,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function saveFile(FileData &$fileData): ?FileData
     {
-        $shareLink = new ShareLinkPersistence();
-
+        $destinationFilenameArray = $this->generatePath($fileData);
         /** @var ?UploadedFile $uploadedFile */
         $uploadedFile = $fileData->getFile();
-        $folder = substr($fileData->getIdentifier(), 0, 2);
-        $id = $fileData->getIdentifier();
-        $safeFilename = $this->slugger->slug($id);
-        $newFilename = $safeFilename.'.'.$uploadedFile->guessExtension();
-        $destination = $this->configurationService->getPath();
-        if (substr($destination, -1) !== '/') {
-            $destination .= '/';
-        }
-        $destination .= $fileData->getBucket()->getPath();
-        if (substr($destination, -1) !== '/') {
-            $destination .= '/';
-        }
-        $destination .= $folder;
-
         try {
-            $uploadedFile->move($destination, $newFilename);
+            $uploadedFile->move($destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
         } catch (FileException $e) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error');
         }
 
-        /* Move File from images to copyImages folder*/
-
         //generate link
-        $shareLinkId = (string) Uuid::v4();
-        $contentUrl = $this->generateContentUrl($shareLinkId);
-        $fileData->setContentUrl($contentUrl);
-
-        $shareLink->setIdentifier($shareLinkId);
-        $shareLink->setFileDataIdentifier($id);
-        $shareLink->setLink($contentUrl);
-
-        // Create a valid until date
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $linkExpireTime = $this->configurationService->getLinkExpireTime();
-        $validUntil = $now->add(new \DateInterval($linkExpireTime));
-        $shareLink->setValidUntil($validUntil); //get valid out from config
+        $shareLink = $this->generateShareLink($fileData->getIdentifier(), $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
+        $fileData->setContentUrl($shareLink->getLink());
 
         //save data to database
         try {
@@ -127,10 +102,50 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
+    private function generatePath(FileData $fileData): Array
+    {
+        /** @var ?UploadedFile $uploadedFile */
+        $uploadedFile = $fileData->getFile();
+        $id = $fileData->getIdentifier();
+        $folder = substr($id, 0, 2);
+        $safeFilename = $this->slugger->slug($id);
+        $newFilename = $safeFilename.'.'.$uploadedFile->guessExtension();
+        $destination = $this->configurationService->getPath();
+        if (substr($destination, -1) !== '/') {
+            $destination .= '/';
+        }
+        $destination .= $fileData->getBucket()->getPath();
+        if (substr($destination, -1) !== '/') {
+            $destination .= '/';
+        }
+        $destination .= $folder;
+        return array('destination' => $destination, 'filename' => $newFilename);
+    }
+
     private function generateContentUrl(string $id): string
     {
         $link = $this->configurationService->getLinkUrl();
 
         return $link.'blob/'.$id;
+    }
+
+    private function generateShareLink(string $fileDataIde, string $path): ShareLinkPersistence
+    {
+        $shareLinkId = (string) Uuid::v4();
+        $shareLink = new ShareLinkPersistence();
+        $shareLink->setIdentifier($shareLinkId);
+        $shareLink->setFileDataIdentifier($fileDataIde);
+        $contentUrl = $this->generateContentUrl($shareLinkId);
+        $shareLink->setLink($contentUrl);
+
+        // Create a valid until date
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $linkExpireTime = $this->configurationService->getLinkExpireTime();
+        $validUntil = $now->add(new \DateInterval($linkExpireTime));
+        $shareLink->setValidUntil($validUntil);
+
+        $shareLink->setFilesystemPath($path);
+
+        return $shareLink;
     }
 }

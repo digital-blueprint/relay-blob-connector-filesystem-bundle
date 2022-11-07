@@ -37,6 +37,12 @@ class ShareLinkPersistence
     private $fileDataIdentifier;
 
     /**
+     * @var string
+     * @ORM\Column(name="filesystem_path", type="string")
+     */
+    private $filesystemPath;
+
+    /**
      * @return mixed
      */
     public function getIdentifier()
@@ -80,5 +86,21 @@ class ShareLinkPersistence
     public function setFileDataIdentifier(string $fileDataIdentifier): void
     {
         $this->fileDataIdentifier = $fileDataIdentifier;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilesystemPath(): string
+    {
+        return $this->filesystemPath;
+    }
+
+    /**
+     * @param string $filesystemPath
+     */
+    public function setFilesystemPath(string $filesystemPath): void
+    {
+        $this->filesystemPath = $filesystemPath;
     }
 }
