@@ -32,7 +32,6 @@ class SharedFileService
         $this->em->getConnection()->connect();
     }
 
-
     public function getSharedFile(string $identifier): ?ShareLinkPersistence
     {
         $sharedLinkPersistence = $this->em
