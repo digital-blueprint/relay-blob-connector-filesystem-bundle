@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Validator\Constraints\File;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -36,8 +35,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
     private $slugger;
 
     private $targetDirectory;
-
-
 
     public function __construct(EntityManagerInterface $em, ConfigurationService $configurationService, SluggerInterface $slugger)
     {
@@ -102,7 +99,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
-    private function generatePath(FileData $fileData): Array
+    private function generatePath(FileData $fileData): array
     {
         /** @var ?UploadedFile $uploadedFile */
         $uploadedFile = $fileData->getFile();
@@ -119,7 +116,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
             $destination .= '/';
         }
         $destination .= $folder;
-        return array('destination' => $destination, 'filename' => $newFilename);
+
+        return ['destination' => $destination, 'filename' => $newFilename];
     }
 
     private function generateContentUrl(string $id): string

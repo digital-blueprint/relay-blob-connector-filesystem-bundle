@@ -6,11 +6,8 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\FormalizeBundle\Entity\Submission;
-use Dbp\Relay\FormalizeBundle\Entity\SubmissionPersistence;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class SharedFileService
@@ -41,6 +38,7 @@ class SharedFileService
         if (!$sharedLinkPersistence) {
             throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found!', 'blob-connector-filesystem:file-not-found');
         }
+
         return $sharedLinkPersistence;
     }
 }

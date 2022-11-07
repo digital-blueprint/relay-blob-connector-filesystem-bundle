@@ -6,11 +6,7 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
-use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Controller\DownloadFileController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -50,7 +46,6 @@ class SharedFile
      */
     private $shareLink; // dont know if we need this here
 
-
     /**
      * @Groups({"BlobConnectorFilesystem:output"})
      *
@@ -68,33 +63,21 @@ class SharedFile
         $this->identifier = $identifier;
     }
 
-    /**
-     * @return ShareLinkPersistence
-     */
     public function getShareLink(): ShareLinkPersistence
     {
         return $this->shareLink;
     }
 
-    /**
-     * @param ShareLinkPersistence $shareLink
-     */
     public function setShareLink(ShareLinkPersistence $shareLink): void
     {
         $this->shareLink = $shareLink;
     }
 
-    /**
-     * @return BinaryFileResponse
-     */
     public function getBinaryFileResponse(): BinaryFileResponse
     {
         return $this->binaryFileResponse;
     }
 
-    /**
-     * @param BinaryFileResponse $binaryFileResponse
-     */
     public function setBinaryFileResponse($binaryFileResponse): void
     {
         $this->binaryFileResponse = $binaryFileResponse;

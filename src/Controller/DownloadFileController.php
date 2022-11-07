@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Controller;
 
-use Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService;
 use Dbp\Relay\BlobBundle\Service\BlobService;
-use Dbp\Relay\BlobBundle\Entity\FileData;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class DownloadFileController extends AbstractController
 {
-
     /**
      * @var SharedFileService
      */
@@ -39,8 +38,7 @@ class DownloadFileController extends AbstractController
         }
 
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        if($now > $sharedLinkPersistence->getValidUntil())
-        {
+        if ($now > $sharedLinkPersistence->getValidUntil()) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink is not valid anymore', 'blobConnectorFilesystem:sharelink-invalid');
         }
 
@@ -52,6 +50,7 @@ class DownloadFileController extends AbstractController
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $filename
         );
+
         return $response;
     }
 }

@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Set identifier to unique
+ * Set identifier to unique.
  */
 final class Version20221102141900 extends AbstractMigration
 {

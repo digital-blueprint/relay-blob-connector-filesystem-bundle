@@ -88,17 +88,11 @@ class ShareLinkPersistence
         $this->fileDataIdentifier = $fileDataIdentifier;
     }
 
-    /**
-     * @return string
-     */
     public function getFilesystemPath(): string
     {
         return $this->filesystemPath;
     }
 
-    /**
-     * @param string $filesystemPath
-     */
     public function setFilesystemPath(string $filesystemPath): void
     {
         $this->filesystemPath = $filesystemPath;
