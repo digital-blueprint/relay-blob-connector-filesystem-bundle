@@ -58,7 +58,7 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
                         'naming_strategy' => 'doctrine.orm.naming_strategy.underscore_number_aware',
                         'connection' => 'dbp_relay_blob_connector_filesystem_bundle',
                         'mappings' => [
-                            'dbp_relay_blob_connector_filesystem_bundle' => [
+                            'dbp_relay_blob_connector_filesystem' => [
                                 'type' => 'annotation',
                                 'dir' => __DIR__.'/../Entity',
                                 'prefix' => 'Dbp\Relay\BlobConnectorFilesystemBundle\Entity',

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
 
 /**
  * Create table blob_connector_local.
  */
-final class Version20221024082730 extends AbstractMigration
+final class Version20221024082730 extends EntityManagerMigration
 {
     public function getDescription(): string
     {

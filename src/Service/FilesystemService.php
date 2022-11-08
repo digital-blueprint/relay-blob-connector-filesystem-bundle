@@ -55,6 +55,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
+        dump("------------------------------");
+        dump($destinationFilenameArray);
         /** @var ?UploadedFile $uploadedFile */
         $uploadedFile = $fileData->getFile();
         try {
@@ -85,37 +87,63 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function renameFile(FileData &$fileData): ?FileData
     {
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+
         return null;
     }
 
     public function getLink(FileData &$fileData, PoliciesStruct $policiesStruct): ?FileData
     {
-        return null;
+        try {
+            $destinationFilenameArray = $this->generatePath($fileData);
+        } catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
+        }
+        try {
+            $shareLink = $this->generateShareLink($fileData->getIdentifier(), $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
+        } catch (FileException $e) {
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-sharelink-error');
+        }
+        $fileData->setContentUrl($shareLink->getLink());
+
+        //save sharelink to database
+        try {
+            $this->em->persist($shareLink);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'ShareLink could not be saved!', 'blob-connector-filesystem:sharelink-not-saved', ['message' => $e->getMessage()]);
+        }
+
+        return $fileData;
     }
 
     public function removeFile(FileData &$fileData): bool
     {
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+
         return true;
     }
 
     public function removePathFromBucket(string $path, Bucket $bucket): bool
     {
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+
         return true;
     }
 
     public function removeBucket(Bucket $bucket): bool
     {
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+
         return true;
     }
 
     private function generatePath(FileData $fileData): array
     {
-        /** @var ?UploadedFile $uploadedFile */
-        $uploadedFile = $fileData->getFile();
         $id = $fileData->getIdentifier();
         $folder = substr($id, 0, 2);
         $safeFilename = $this->slugger->slug($id);
-        $newFilename = $safeFilename.'.'.$uploadedFile->guessExtension();
+        $newFilename = $safeFilename.'.'.$fileData->getExtension();
         $destination = $this->configurationService->getPath();
         if (substr($destination, -1) !== '/') {
             $destination .= '/';
@@ -133,7 +161,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     {
         $link = $this->configurationService->getLinkUrl();
 
-        return $link.'blob/'.$id;
+        return $link.'blob/filesystem/'.$id;
     }
 
     private function generateShareLink(string $fileDataIde, string $path): ShareLinkPersistence
