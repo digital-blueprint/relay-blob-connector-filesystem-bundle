@@ -50,7 +50,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function saveFile(FileData &$fileData): ?FileData
     {
-        $destinationFilenameArray = $this->generatePath($fileData);
+        try {
+            $destinationFilenameArray = $this->generatePath($fileData);
+        } catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
+        }
         /** @var ?UploadedFile $uploadedFile */
         $uploadedFile = $fileData->getFile();
         try {
@@ -60,7 +64,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         //generate link
-        $shareLink = $this->generateShareLink($fileData->getIdentifier(), $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
+        try {
+            $shareLink = $this->generateShareLink($fileData->getIdentifier(), $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
+        } catch (FileException $e) {
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-sharelink-error');
+        }
+
         $fileData->setContentUrl($shareLink->getLink());
 
         //save data to database
