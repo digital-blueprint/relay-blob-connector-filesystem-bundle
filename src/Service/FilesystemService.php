@@ -55,8 +55,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
-        dump("------------------------------");
-        dump($destinationFilenameArray);
+
         /** @var ?UploadedFile $uploadedFile */
         $uploadedFile = $fileData->getFile();
         try {
@@ -87,7 +86,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function renameFile(FileData &$fileData): ?FileData
     {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
 
         return null;
     }
@@ -119,21 +118,21 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function removeFile(FileData &$fileData): bool
     {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
 
         return true;
     }
 
     public function removePathFromBucket(string $path, Bucket $bucket): bool
     {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
 
         return true;
     }
 
     public function removeBucket(Bucket $bucket): bool
     {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented', ['message' => $e->getMessage()]);
+        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
 
         return true;
     }
