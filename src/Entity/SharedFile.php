@@ -10,29 +10,6 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Controller\DownloadFileController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     collectionOperations={},
- *     itemOperations={
- *         "get" = {
- *             "method" = "GET",
- *             "path" = "/blob/filesystem/{identifier}",
- *             "controller" = DownloadFileController::class,
- *             "read" = false,
- *             "openapi_context" = {
- *                 "tags" = {"Blob"},
- *                 "summary" = "Download a specific file from a file share link",
- *             }
- *         },
- *     },
- *     iri="https://schema.org/Entity",
- *     shortName="BlobConnectorFilesystem",
- *     normalizationContext={
- *         "groups" = {"BlobConnectorFilesystem:output"},
- *         "jsonld_embed_context" = true
- *     }
- * )
- */
 class SharedFile
 {
     /**

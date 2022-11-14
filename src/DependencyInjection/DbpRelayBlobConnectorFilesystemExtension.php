@@ -26,6 +26,8 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
         );
         $loader->load('services.yaml');
 
+        $this->addRouteResource($container, __DIR__.'/../Resources/config/routing.yaml', 'yaml');
+
         $definition = $container->getDefinition(ConfigurationService::class);
         $definition->addMethodCall('setConfig', [$mergedConfig]);
     }
