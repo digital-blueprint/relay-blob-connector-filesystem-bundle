@@ -16,7 +16,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     itemOperations={
  *         "get" = {
  *             "method" = "GET",
- *             "security" = "is_granted('IS_AUTHENTICATED_FULLY')",
  *             "path" = "/blob/filesystem/{identifier}",
  *             "controller" = DownloadFileController::class,
  *             "read" = false,

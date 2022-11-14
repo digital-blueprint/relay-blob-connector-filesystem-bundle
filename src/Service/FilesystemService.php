@@ -175,11 +175,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // Create a valid until date
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $linkExpireTime = $this->configurationService->getLinkExpireTime();
-        try {
-            $validUntil = $now->add(new \DateInterval($linkExpireTime));
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'ShareLink could not be generated due DateIntervalerror!', 'blob-connector-filesystem:sharelink-not-generated', ['message' => $e->getMessage()]);
-        }
+
+        $validUntil = $now->add(new \DateInterval($linkExpireTime));
+
         $shareLink->setValidUntil($validUntil);
 
         $shareLink->setFilesystemPath($path);
