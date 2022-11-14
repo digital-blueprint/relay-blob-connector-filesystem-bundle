@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Controller\DownloadFileController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
 
