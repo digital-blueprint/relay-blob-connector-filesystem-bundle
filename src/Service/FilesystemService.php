@@ -36,11 +36,14 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private $targetDirectory;
 
-    public function __construct(EntityManagerInterface $em, ConfigurationService $configurationService, SluggerInterface $slugger)
+    private $sharedFileService;
+
+    public function __construct(EntityManagerInterface $em, ConfigurationService $configurationService, SluggerInterface $slugger, SharedFileService $sharedFileService)
     {
         $this->configurationService = $configurationService;
         $this->em = $em;
         $this->slugger = $slugger;
+        $this->sharedFileService = $sharedFileService;
     }
 
     public function checkConnection()
@@ -86,10 +89,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function renameFile(FileData &$fileData): ?FileData
     {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
-
-        return null;
+        // Nothing todo here beause its only saved in blobBundle
+        return $fileData;
     }
+
 
     public function getLink(FileData &$fileData, PoliciesStruct $policiesStruct): ?FileData
     {
@@ -118,9 +121,28 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function removeFile(FileData &$fileData): bool
     {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
+        // Delete ShareLinks
+        $this->sharedFileService->removeShareLinkPersistencesByFileDataID($fileData->getIdentifier());
+
+        $destinationFilenameArray = $this->generatePath($fileData);
+        $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+
+        // Remove File from server
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
+        // Remove folder if empty
+        if ($this->is_dir_empty($destinationFilenameArray['destination'])) {
+            rmdir($destinationFilenameArray['destination']);
+        }
 
         return true;
+    }
+
+    private function is_dir_empty($dir) {
+        if (!is_readable($dir)) return NULL;
+        return (count(scandir($dir)) == 2);
     }
 
     public function removePathFromBucket(string $path, Bucket $bucket): bool

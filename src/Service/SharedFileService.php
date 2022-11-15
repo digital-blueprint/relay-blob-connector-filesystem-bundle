@@ -36,9 +36,35 @@ class SharedFileService
             ->find($identifier);
 
         if (!$sharedLinkPersistence) {
-            throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found!', 'blob-connector-filesystem:file-not-found');
+            throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'Fileshare was not found!', 'blob-connector-filesystem:fileshare-not-found');
         }
 
         return $sharedLinkPersistence;
+    }
+
+    public function getAllSharedFiles(string $identifier): array
+    {
+        $sharedLinkPersistences = $this->em
+            ->getRepository(ShareLinkPersistence::class)
+            ->findBy(array('fileDataIdentifier' => $identifier ));
+
+        return $sharedLinkPersistences;
+    }
+
+    public function removeShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence) {
+        $this->em->remove($shareLinkPersistence);
+        $this->em->flush();
+    }
+
+    public function removeShareLinkPersistences(array $shareLinkPersistences) {
+        foreach ($shareLinkPersistences as $shareLinkPersistence) {
+            $this->removeShareLinkPersistence($shareLinkPersistence);
+        }
+    }
+
+    public function removeShareLinkPersistencesByFileDataID(string $identifier) {
+        $sharedFiles = $this->getAllSharedFiles($identifier);
+        dump($sharedFiles);
+        $this-> removeShareLinkPersistences($sharedFiles);
     }
 }
