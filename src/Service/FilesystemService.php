@@ -142,10 +142,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
     private function is_dir_empty($dir)
     {
         if (!is_readable($dir)) {
-            return NULL;
+            return null;
         }
 
-        return count(scandir($dir)) == 2;
+        return count(scandir($dir)) === 2;
     }
 
     public function removePathFromBucket(string $path, Bucket $bucket): bool
