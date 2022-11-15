@@ -46,25 +46,28 @@ class SharedFileService
     {
         $sharedLinkPersistences = $this->em
             ->getRepository(ShareLinkPersistence::class)
-            ->findBy(array('fileDataIdentifier' => $identifier ));
+            ->findBy(['fileDataIdentifier' => $identifier]);
 
         return $sharedLinkPersistences;
     }
 
-    public function removeShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence) {
+    public function removeShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence)
+    {
         $this->em->remove($shareLinkPersistence);
         $this->em->flush();
     }
 
-    public function removeShareLinkPersistences(array $shareLinkPersistences) {
+    public function removeShareLinkPersistences(array $shareLinkPersistences)
+    {
         foreach ($shareLinkPersistences as $shareLinkPersistence) {
             $this->removeShareLinkPersistence($shareLinkPersistence);
         }
     }
 
-    public function removeShareLinkPersistencesByFileDataID(string $identifier) {
+    public function removeShareLinkPersistencesByFileDataID(string $identifier)
+    {
         $sharedFiles = $this->getAllSharedFiles($identifier);
         dump($sharedFiles);
-        $this-> removeShareLinkPersistences($sharedFiles);
+        $this->removeShareLinkPersistences($sharedFiles);
     }
 }

@@ -93,7 +93,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
-
     public function getLink(FileData &$fileData, PoliciesStruct $policiesStruct): ?FileData
     {
         try {
@@ -140,9 +139,13 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
-    private function is_dir_empty($dir) {
-        if (!is_readable($dir)) return NULL;
-        return (count(scandir($dir)) == 2);
+    private function is_dir_empty($dir)
+    {
+        if (!is_readable($dir)) {
+            return NULL;
+        }
+
+        return count(scandir($dir)) == 2;
     }
 
     public function removePathFromBucket(string $path, Bucket $bucket): bool
