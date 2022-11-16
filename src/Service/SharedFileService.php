@@ -29,6 +29,15 @@ class SharedFileService
         $this->em->getConnection()->connect();
     }
 
+    public function saveShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence) {
+        try {
+            $this->em->persist($shareLinkPersistence);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'ShareLink could not be saved!', 'blob-connector-filesystem:sharelink-not-saved', ['message' => $e->getMessage()]);
+        }
+    }
+
     public function getSharedFile(string $identifier): ShareLinkPersistence
     {
         $sharedLinkPersistence = $this->em

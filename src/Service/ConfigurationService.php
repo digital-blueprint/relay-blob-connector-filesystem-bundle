@@ -44,11 +44,11 @@ class ConfigurationService
 
     public function getLinkUrl(): string
     {
-        return $this->config['linkUrl'];
+        return $this->config['link_url'];
     }
 
     public function getLinkExpireTime(): string
     {
-        return $this->config['linkExpireTime'];
+        return $this->config['link_expire_time'];
     }
 }
