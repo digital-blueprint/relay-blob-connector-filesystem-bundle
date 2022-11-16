@@ -4,7 +4,7 @@ services:
     autoconfigure: true
     public: true
 
-  Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService:
+  Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService:
     autowire: true
     autoconfigure: true
     public: true
