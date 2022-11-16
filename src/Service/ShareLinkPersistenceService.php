@@ -7,10 +7,9 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 
-class SharedFileService
+class ShareLinkPersistenceService
 {
     /**
      * @var EntityManagerInterface

@@ -35,15 +35,15 @@ class FilesystemService implements DatasystemProviderServiceInterface
     private $slugger;
 
     /**
-     * @var SharedFileService
+     * @var ShareLinkPersistenceService
      */
-    private $sharedFileService;
+    private $shareLinkPersistenceService;
 
-    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger, SharedFileService $sharedFileService)
+    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger, SharedFileService $shareLinkPersistenceService)
     {
         $this->configurationService = $configurationService;
         $this->slugger = $slugger;
-        $this->sharedFileService = $sharedFileService;
+        $this->sharedFileService = $shareLinkPersistenceService;
     }
 
     public function saveFile(FileData &$fileData): ?FileData
