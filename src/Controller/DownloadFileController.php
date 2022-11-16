@@ -37,9 +37,9 @@ class DownloadFileController extends AbstractController
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No identifier set', 'blobConnectorFilesystem:no-identifier-set');
         }
 
-        $sharedLinkPersistence = $this->sharedFileService->getSharedFile($identifier);
+        $sharedLinkPersistence = $this->sharedFileService->getShareLinkPersistence($identifier);
         if (!$sharedLinkPersistence) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No file wat this share id found', 'blobConnectorFilesystem:download-file');
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No file with this share id found', 'blobConnectorFilesystem:download-file');
         }
 
         // Check if sharelink is already invalid

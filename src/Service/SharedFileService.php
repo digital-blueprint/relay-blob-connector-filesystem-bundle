@@ -17,11 +17,9 @@ class SharedFileService
      */
     private $em;
 
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(EntityManagerInterface $em)
     {
-        $manager = $managerRegistry->getManager('dbp_relay_blob_connector_filesystem_bundle');
-        assert($manager instanceof EntityManagerInterface);
-        $this->em = $manager;
+        $this->em = $em;
     }
 
     public function checkConnection()
@@ -38,7 +36,7 @@ class SharedFileService
         }
     }
 
-    public function getSharedFile(string $identifier): ShareLinkPersistence
+    public function getShareLinkPersistence(string $identifier): ShareLinkPersistence
     {
         $sharedLinkPersistence = $this->em
             ->getRepository(ShareLinkPersistence::class)
@@ -51,7 +49,7 @@ class SharedFileService
         return $sharedLinkPersistence;
     }
 
-    public function getAllSharedFiles(string $identifier): array
+    public function getAllShareLinkPersistencesByFileDataID(string $identifier): array
     {
         $sharedLinkPersistences = $this->em
             ->getRepository(ShareLinkPersistence::class)
@@ -73,9 +71,9 @@ class SharedFileService
         }
     }
 
-    public function removeShareLinkPersistencesByFileDataID(string $identifier)
+    public function removeShareLinkPersistencesByFileDataID(string $filedataIdentifier)
     {
-        $sharedFiles = $this->getAllSharedFiles($identifier);
-        $this->removeShareLinkPersistences($sharedFiles);
+        $shareLinkPersistences = $this->getAllShareLinkPersistencesByFileDataID($filedataIdentifier);
+        $this->removeShareLinkPersistences($shareLinkPersistences);
     }
 }
