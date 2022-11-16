@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Controller;
 
 use Dbp\Relay\BlobBundle\Service\BlobService;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -16,18 +16,18 @@ use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 class DownloadFileController extends AbstractController
 {
     /**
-     * @var SharedFileService
+     * @var ShareLinkPersistenceService
      */
-    private $sharedFileService;
+    private $shareLinkPersistenceService;
 
     /**
      * @var BlobService
      */
     private $blobService;
 
-    public function __construct(SharedFileService $sharedFileService, BlobService $blobService)
+    public function __construct(ShareLinkPersistenceService $shareLinkPersistenceService, BlobService $blobService)
     {
-        $this->sharedFileService = $sharedFileService;
+        $this->shareLinkPersistenceService = $shareLinkPersistenceService;
         $this->blobService = $blobService;
     }
 
@@ -37,7 +37,7 @@ class DownloadFileController extends AbstractController
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No identifier set', 'blobConnectorFilesystem:no-identifier-set');
         }
 
-        $sharedLinkPersistence = $this->sharedFileService->getShareLinkPersistence($identifier);
+        $sharedLinkPersistence = $this->shareLinkPersistenceService->getShareLinkPersistence($identifier);
         if (!$sharedLinkPersistence) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No file with this share id found', 'blobConnectorFilesystem:download-file');
         }

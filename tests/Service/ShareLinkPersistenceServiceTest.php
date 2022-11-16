@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
 
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Service\SharedFileService;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\ORMSetup;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Uuid;
 
-class SharedFileServiceTest extends WebTestCase
+class ShareLinkPersistenceServiceTest extends WebTestCase
 {
     private $api;
 
@@ -33,10 +33,10 @@ class SharedFileServiceTest extends WebTestCase
               file_data_identifier varchar(255) NOT NULL,
               filesystem_path varchar(255) NOT NULL, PRIMARY KEY(identifier))');
 
-        $this->api = new SharedFileService($em);
+        $this->api = new ShareLinkPersistenceService($em);
     }
 
-    public function testCreateSharedLinkPersistence()
+    public function testCreateShareLinkPersistence()
     {
         $shareLinkId = (string) Uuid::v4();
         $shareLinkPersistence = new ShareLinkPersistence();
