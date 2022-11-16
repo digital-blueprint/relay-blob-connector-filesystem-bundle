@@ -13,7 +13,6 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
@@ -124,6 +123,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 
         FileOperations::removeFile($path, $destinationFilenameArray['destination']);
+
         return true;
     }
 
