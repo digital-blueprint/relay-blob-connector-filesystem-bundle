@@ -67,7 +67,6 @@ class SharedFileService
     public function removeShareLinkPersistencesByFileDataID(string $identifier)
     {
         $sharedFiles = $this->getAllSharedFiles($identifier);
-        dump($sharedFiles);
         $this->removeShareLinkPersistences($sharedFiles);
     }
 }

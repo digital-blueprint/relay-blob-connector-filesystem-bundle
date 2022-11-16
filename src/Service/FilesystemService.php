@@ -9,6 +9,7 @@ use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -34,8 +35,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private $slugger;
 
-    private $targetDirectory;
-
+    /**
+     * @var SharedFileService
+     */
     private $sharedFileService;
 
     public function __construct(EntityManagerInterface $em, ConfigurationService $configurationService, SluggerInterface $slugger, SharedFileService $sharedFileService)
@@ -59,13 +61,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
 
-        /** @var ?UploadedFile $uploadedFile */
-        $uploadedFile = $fileData->getFile();
-        try {
-            $uploadedFile->move($destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
-        } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error');
-        }
+        //Upload file
+        FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
         //generate link
         try {
@@ -126,26 +123,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $destinationFilenameArray = $this->generatePath($fileData);
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 
-        // Remove File from server
-        if (file_exists($path)) {
-            unlink($path);
-        }
-
-        // Remove folder if empty
-        if ($this->is_dir_empty($destinationFilenameArray['destination'])) {
-            rmdir($destinationFilenameArray['destination']);
-        }
-
+        FileOperations::removeFile($path, $destinationFilenameArray['destination']);
         return true;
-    }
-
-    private function is_dir_empty($dir)
-    {
-        if (!is_readable($dir)) {
-            return null;
-        }
-
-        return count(scandir($dir)) === 2;
     }
 
     public function removePathFromBucket(string $path, Bucket $bucket): bool

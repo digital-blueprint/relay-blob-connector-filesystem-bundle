@@ -42,6 +42,7 @@ class DownloadFileController extends AbstractController
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No file wat this share id found', 'blobConnectorFilesystem:download-file');
         }
 
+        // Check if sharelink is already invalid
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         if ($now > $sharedLinkPersistence->getValidUntil()) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink is not valid anymore', 'blobConnectorFilesystem:sharelink-invalid');

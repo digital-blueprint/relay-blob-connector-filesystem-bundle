@@ -18,7 +18,7 @@ class SharedFile
     /**
      * @var ShareLinkPersistence
      */
-    private $shareLink; // dont know if we need this here
+    private $shareLink; // TODO dont know if we need this here
 
     /**
      * @Groups({"BlobConnectorFilesystem:output"})
