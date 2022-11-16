@@ -39,11 +39,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private $shareLinkPersistenceService;
 
-    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger, SharedFileService $shareLinkPersistenceService)
+    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger, ShareLinkPersistenceService $shareLinkPersistenceService)
     {
         $this->configurationService = $configurationService;
         $this->slugger = $slugger;
-        $this->sharedFileService = $shareLinkPersistenceService;
+        $this->shareLinkPersistenceService = $shareLinkPersistenceService;
     }
 
     public function saveFile(FileData &$fileData): ?FileData
@@ -67,7 +67,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $fileData->setContentUrl($shareLinkPersistence->getLink());
 
         //save data to database
-        $this->sharedFileService->saveShareLinkPersistence($shareLinkPersistence);
+        $this->shareLinkPersistenceService->saveShareLinkPersistence($shareLinkPersistence);
 
         return $fileData;
     }
@@ -93,7 +93,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $fileData->setContentUrl($shareLinkPersistence->getLink());
 
         //save sharelink to database
-        $this->sharedFileService->saveShareLinkPersistence($shareLinkPersistence);
+        $this->shareLinkPersistenceService->saveShareLinkPersistence($shareLinkPersistence);
 
         return $fileData;
     }
@@ -101,7 +101,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     public function removeFile(FileData &$fileData): bool
     {
         // Delete ShareLinks
-        $this->sharedFileService->removeShareLinkPersistencesByFileDataID($fileData->getIdentifier());
+        $this->shareLinkPersistenceService->removeShareLinkPersistencesByFileDataID($fileData->getIdentifier());
 
         $destinationFilenameArray = $this->generatePath($fileData);
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
