@@ -26,7 +26,8 @@ class ShareLinkPersistenceService
         $this->em->getConnection()->connect();
     }
 
-    public function saveShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence) {
+    public function saveShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence)
+    {
         try {
             $this->em->persist($shareLinkPersistence);
             $this->em->flush();

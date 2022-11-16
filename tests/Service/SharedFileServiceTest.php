@@ -41,15 +41,15 @@ class SharedFileServiceTest extends WebTestCase
         $shareLinkId = (string) Uuid::v4();
         $shareLinkPersistence = new ShareLinkPersistence();
         $shareLinkPersistence->setIdentifier($shareLinkId);
-        $shareLinkPersistence->setFilesystemPath("mypath/my-subpath");
-        $shareLinkPersistence->setFileDataIdentifier("someid");
-        $shareLinkPersistence->setLink("mylink");
+        $shareLinkPersistence->setFilesystemPath('mypath/my-subpath');
+        $shareLinkPersistence->setFileDataIdentifier('someid');
+        $shareLinkPersistence->setLink('mylink');
         $shareLinkPersistence->setValidUntil(new \DateTimeImmutable('now'));
 
         $this->api->saveShareLinkPersistence($shareLinkPersistence);
 
-        $this->assertCount(1, $this->api->getAllShareLinkPersistencesByFileDataID("someid"));
-        $this->assertSame('mylink', $this->api->getAllShareLinkPersistencesByFileDataID("someid")[0]->getLink());
+        $this->assertCount(1, $this->api->getAllShareLinkPersistencesByFileDataID('someid'));
+        $this->assertSame('mylink', $this->api->getAllShareLinkPersistencesByFileDataID('someid')[0]->getLink());
     }
 
     public function testGetShareLinkPersistence()
@@ -57,14 +57,14 @@ class SharedFileServiceTest extends WebTestCase
         $shareLinkId = (string) Uuid::v4();
         $shareLinkPersistence = new ShareLinkPersistence();
         $shareLinkPersistence->setIdentifier($shareLinkId);
-        $shareLinkPersistence->setFilesystemPath("mypath/my-subpath");
-        $shareLinkPersistence->setFileDataIdentifier("someid");
-        $shareLinkPersistence->setLink("mylink");
+        $shareLinkPersistence->setFilesystemPath('mypath/my-subpath');
+        $shareLinkPersistence->setFileDataIdentifier('someid');
+        $shareLinkPersistence->setLink('mylink');
         $shareLinkPersistence->setValidUntil(new \DateTimeImmutable('now'));
 
         $this->api->saveShareLinkPersistence($shareLinkPersistence);
 
-        $id = $this->api->getAllShareLinkPersistencesByFileDataID("someid")[0]->getIdentifier();
+        $id = $this->api->getAllShareLinkPersistencesByFileDataID('someid')[0]->getIdentifier();
         $shareLinkPersistence = $this->api->getShareLinkPersistence($id);
         $this->assertSame($shareLinkPersistence->getIdentifier(), $id);
     }
