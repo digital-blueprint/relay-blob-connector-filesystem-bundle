@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileOperations
 {
-    private static function isDirEmpty(string $dir)
+    public static function isDirEmpty(string $dir)
     {
         if (!is_readable($dir)) {
             return null;
@@ -25,7 +25,7 @@ class FileOperations
         try {
             $uploadedFile->move($dest, $name);
         } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error');
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error', ['message' => $e->getMessage()]);
         }
     }
 
