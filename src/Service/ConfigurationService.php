@@ -13,15 +13,7 @@ class ConfigurationService
      */
     private $config = [];
 
-    /**
-     * @var UrlHelper
-     */
-    private $urlHelper;
-
-    public function __construct(
-        UrlHelper $urlHelper
-    ) {
-        $this->urlHelper = $urlHelper;
+    public function __construct() {
     }
 
     /**
