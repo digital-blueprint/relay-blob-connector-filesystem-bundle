@@ -34,10 +34,16 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private $shareLinkPersistenceService;
 
-    public function __construct(ConfigurationService $configurationService, ShareLinkPersistenceService $shareLinkPersistenceService)
+    /**
+     * @var SluggerInterface
+     */
+    private $slugger;
+
+    public function __construct(ConfigurationService $configurationService, ShareLinkPersistenceService $shareLinkPersistenceService, SluggerInterface $slugger)
     {
         $this->configurationService = $configurationService;
         $this->shareLinkPersistenceService = $shareLinkPersistenceService;
+        $this->slugger = $slugger;
     }
 
     public function saveFile(FileData &$fileData): ?FileData
@@ -157,7 +163,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // Create a valid until date
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
-        if ($fileData->getBucket() && $fileData->getBucket()->getLinkExpireTime()) {
+        if ($fileData->getBucket() && $fileData->getBucket()->getLinkExpireTime() !== null) {
             $linkExpireTime = $fileData->getBucket()->getLinkExpireTime();
         } else {
             $linkExpireTime = $this->configurationService->getLinkExpireTime();

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
-use Symfony\Component\HttpFoundation\UrlHelper;
-
 class ConfigurationService
 {
     /**
@@ -13,7 +11,8 @@ class ConfigurationService
      */
     private $config = [];
 
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
