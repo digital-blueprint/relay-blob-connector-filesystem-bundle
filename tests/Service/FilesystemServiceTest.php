@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
+
+use Dbp\Relay\BlobBundle\Entity\Bucket;
+use Dbp\Relay\BlobBundle\Entity\FileData;
+use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
+use Doctrine\ORM\ORMSetup;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Uid\Uuid;
+
+class FilesystemServiceTest extends WebTestCase
+{
+    /**
+     * @var ShareLinkPersistenceService
+     */
+    private $shareLinkPersistenceService;
+
+    /**
+     * @var ConfigurationService
+     */
+    private $configurationService;
+
+    /**
+     * @var FilesystemService
+     */
+    private $fileSystemService;
+
+    protected function setUp(): void
+    {
+        $config = ORMSetup::createAnnotationMetadataConfiguration([__DIR__.'/../../src/Entity'], true);
+        $config->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER, true));
+        $em = EntityManager::create(
+            [
+                'driver' => 'pdo_sqlite',
+                'memory' => true,
+            ], $config
+        );
+        $em->getConnection()->executeQuery('CREATE TABLE blob_connector_filesystem (
+              identifier varchar(50) NOT NULL,
+              valid_until DATETIME NOT NULL,
+              link varchar(255) NOT NULL,
+              file_data_identifier varchar(255) NOT NULL,
+              filesystem_path varchar(255) NOT NULL, PRIMARY KEY(identifier))');
+
+        $this->shareLinkPersistenceService = new ShareLinkPersistenceService($em);
+
+        $config = ['path' => dirname(__FILE__), 'link_url' => 'http://localhost:8000/', 'link_expire_time' => 'P7D'];
+        $this->configurationService = new ConfigurationService();
+        $this->configurationService->setConfig($config);
+
+        $slugger = new AsciiSlugger();
+
+        $this->fileSystemService = new FilesystemService($this->configurationService, $this->shareLinkPersistenceService, $slugger);
+    }
+
+    private function getExampleFile(): UploadedFile
+    {
+        $examplePath = dirname(__FILE__).DIRECTORY_SEPARATOR.'test.pdf';
+        // copy file for testing
+        $file = dirname(__FILE__).DIRECTORY_SEPARATOR.'test_original.pdf';
+
+        if (!copy($file, $examplePath)) {
+            assert('Copy testfile went wrong');
+        }
+
+        $uploadedFile = new UploadedFile($examplePath, 'test', 'pdf', null, true);
+
+        return $uploadedFile;
+    }
+
+    public function testSaveGetRemoveFile()
+    {
+        $bucket = new Bucket();
+        $bucket->setPath('testfile');
+        $bucket->setLinkExpireTime('P1D');
+        $fileDataId = (string) Uuid::v4();
+        $fileData = new FileData();
+        $fileData->setIdentifier($fileDataId);
+        $fileData->setFile($this->getExampleFile());
+        $fileData->setExtension('pdf');
+        $fileData->setBucket($bucket);
+
+        $fileDataSaved = $this->fileSystemService->saveFile($fileData);
+
+        $shareLinkPersistence = $this->shareLinkPersistenceService->getAllShareLinkPersistencesByFileDataID($fileDataId);
+
+        $this->assertCount(1, $shareLinkPersistence);
+        $this->assertSame($fileDataSaved->getContentUrl(), $shareLinkPersistence[0]->getLink());
+
+        $fileDataGet = $this->fileSystemService->getLink($fileDataSaved, new PoliciesStruct());
+        $shareLinkPersistencesGet = $this->shareLinkPersistenceService->getAllShareLinkPersistencesByFileDataID($fileDataId);
+        $this->assertCount(2, $shareLinkPersistencesGet);
+        $this->assertSame($fileDataGet->getContentUrl(), $shareLinkPersistencesGet[1]->getLink());
+
+        $ret = $this->fileSystemService->removeFile($fileData);
+        $this->assertTrue($ret);
+        $this->assertCount(0, $this->shareLinkPersistenceService->getAllShareLinkPersistencesByFileDataID($fileDataId));
+
+        //check dir empty
+        $this->assertNull(FileOperations::isDirEmpty('testfile'));
+    }
+}
