@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class DownloadFileController extends AbstractController
 {
@@ -44,8 +46,9 @@ class DownloadFileController extends AbstractController
 
         // Check if sharelink is already invalid
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
         if ($now > $sharedLinkPersistence->getValidUntil()) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink is not valid anymore', 'blobConnectorFilesystem:sharelink-invalid');
+            return $this->fileNotFoundResponse();
         }
 
         $filePath = $sharedLinkPersistence->getFilesystemPath();
@@ -70,6 +73,20 @@ class DownloadFileController extends AbstractController
             $filename
         );
 
+        return $response;
+    }
+
+    public function fileNotFoundResponse(): Response
+    {
+
+        $loader = new FilesystemLoader(dirname(__FILE__).'/../Resources/views/');
+        $twig = new Environment($loader);
+
+        $template = $twig->load('fileNotFound.html.twig');
+        $content = $template->render();
+
+        $response = new Response();
+        $response->setContent($content);
         return $response;
     }
 }

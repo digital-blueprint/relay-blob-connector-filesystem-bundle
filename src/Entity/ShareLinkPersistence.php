@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Entity;
 
+date_default_timezone_set('UTC');
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**

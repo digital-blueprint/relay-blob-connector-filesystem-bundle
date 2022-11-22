@@ -169,6 +169,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             $linkExpireTime = $this->configurationService->getLinkExpireTime();
         }
 
+
         $validUntil = $now->add(new \DateInterval($linkExpireTime));
 
         $shareLink->setValidUntil($validUntil);

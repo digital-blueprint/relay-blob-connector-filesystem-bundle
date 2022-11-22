@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Link expired</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        .alert {
+            position: relative;
+            padding: 1rem;
+        }
+        .alert-danger {
+            color: #842029;
+            background: #f8d7da;
+        }
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+
+<script src="{{ scriptSrc }}"></script>
+<script type="text/javascript">
+
+    var userLang = navigator.language || navigator.userLanguage;
+    var div = document.createElement('div');
+
+    div.classList.add('alert', 'alert-danger');
+    div.attributes['role'] = 'alert';
+    if (userLang === 'de') {
+        div.innerText = 'Dieser Link ist leider abgelaufen!'
+    } else {
+        div.innerText = 'Sorry, this link has expired!'
+    }
+
+    var body = document.querySelector('body');
+    body.append(div);
+
+</script>
+</body>
+</html>
