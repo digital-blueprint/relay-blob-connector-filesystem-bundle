@@ -78,7 +78,6 @@ class DownloadFileController extends AbstractController
 
     public function fileNotFoundResponse(): Response
     {
-
         $loader = new FilesystemLoader(dirname(__FILE__).'/../Resources/views/');
         $twig = new Environment($loader);
 
@@ -87,6 +86,7 @@ class DownloadFileController extends AbstractController
 
         $response = new Response();
         $response->setContent($content);
+
         return $response;
     }
 }
