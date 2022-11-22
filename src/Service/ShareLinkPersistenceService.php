@@ -7,6 +7,7 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 
 class ShareLinkPersistenceService
@@ -16,9 +17,11 @@ class ShareLinkPersistenceService
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        $this->em = $em;
+        $manager = $managerRegistry->getManager('dbp_relay_blob_connector_filesystem_bundle');
+        assert($manager instanceof EntityManagerInterface);
+        $this->em = $manager;
     }
 
     public function checkConnection()
