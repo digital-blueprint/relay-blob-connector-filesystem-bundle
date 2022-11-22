@@ -9,6 +9,7 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\ORMSetup;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Uuid;
 
@@ -33,7 +34,10 @@ class ShareLinkPersistenceServiceTest extends WebTestCase
               file_data_identifier varchar(255) NOT NULL,
               filesystem_path varchar(255) NOT NULL, PRIMARY KEY(identifier))');
 
-        $this->api = new ShareLinkPersistenceService($em);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->any())->method('getManager')->willReturn($em);
+
+        $this->api = new ShareLinkPersistenceService($managerRegistry);
     }
 
     public function testCreateShareLinkPersistence()

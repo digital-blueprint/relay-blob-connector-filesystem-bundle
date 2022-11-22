@@ -12,8 +12,10 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\ORMSetup;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -53,7 +55,10 @@ class FilesystemServiceTest extends WebTestCase
               file_data_identifier varchar(255) NOT NULL,
               filesystem_path varchar(255) NOT NULL, PRIMARY KEY(identifier))');
 
-        $this->shareLinkPersistenceService = new ShareLinkPersistenceService($em);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->any())->method('getManager')->willReturn($em);
+
+        $this->shareLinkPersistenceService = new ShareLinkPersistenceService($managerRegistry);
 
         $config = ['path' => dirname(__FILE__), 'link_url' => 'http://localhost:8000/', 'link_expire_time' => 'P7D'];
         $this->configurationService = new ConfigurationService();
