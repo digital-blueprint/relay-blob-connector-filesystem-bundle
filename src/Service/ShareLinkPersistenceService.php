@@ -79,4 +79,22 @@ class ShareLinkPersistenceService
         $shareLinkPersistences = $this->getAllShareLinkPersistencesByFileDataID($filedataIdentifier);
         $this->removeShareLinkPersistences($shareLinkPersistences);
     }
+
+    public function cleanUp()
+    {
+        // get all invalid links
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        $invalidShareLinkPersistenceQuery = $this->em
+            ->getRepository(ShareLinkPersistence::class)
+            ->createQueryBuilder('p')
+            ->where('p.validUntil < :now')
+            ->setParameter('now', $now)
+            ->getQuery();
+
+        $invalidShareLinkPersistence = $invalidShareLinkPersistenceQuery->getResult();
+
+        // remove all invalid links
+        $this->removeShareLinkPersistences($invalidShareLinkPersistence);
+    }
 }

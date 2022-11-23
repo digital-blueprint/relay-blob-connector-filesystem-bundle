@@ -1,4 +1,8 @@
 services:
+  Dbp\Relay\BlobConnectorFilesystemBundle\Cron\CleanupCronJob:
+    autowire: true
+    autoconfigure: true
+
   Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService:
     autowire: true
     autoconfigure: true
