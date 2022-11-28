@@ -173,7 +173,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-blob-bundle.git",
-                "reference": "97bb4bbc5099d75673cca932b83f7ca32de50c7b"
+                "reference": "c3c82e7ad5bf324036b80ce59f84287ca4ad3261"
             },
             "dist": {
                 "type": "zip",
@@ -247,7 +247,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/issues"
             },
-            "time": "2022-11-28T00:08:49+00:00"
+            "time": "2022-11-28T07:48:48+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
