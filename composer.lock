@@ -173,7 +173,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-blob-bundle.git",
-                "reference": "91ab6786506a2af36e62ae6fe26f0b2d11b793ba"
+                "reference": "df4e96ca473483b8adf783f8e85b297453deece3"
             },
             "require": {
                 "api-platform/core": "^2.6",
@@ -238,7 +238,7 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "A bundle for fileserving, persisting and managing",
-            "time": "2022-12-12T14:15:56+00:00"
+            "time": "2022-12-13T10:12:21+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
