@@ -91,7 +91,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
         $fileData->setContentUrl($shareLinkPersistence->getLink());
 
-        //save sharelink to database
+        // Save sharelink to database
         $this->shareLinkPersistenceService->saveShareLinkPersistence($shareLinkPersistence);
 
         return $fileData;
@@ -102,6 +102,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // Delete ShareLinks
         $this->shareLinkPersistenceService->removeShareLinkPersistencesByFileDataID($fileData->getIdentifier());
 
+        // Delete the file
         $destinationFilenameArray = $this->generatePath($fileData);
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 

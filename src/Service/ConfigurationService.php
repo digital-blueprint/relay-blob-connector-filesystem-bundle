@@ -11,13 +11,6 @@ class ConfigurationService
      */
     private $config = [];
 
-    public function __construct()
-    {
-    }
-
-    /**
-     * @return void
-     */
     public function setConfig(array $config)
     {
         $this->config = $config;

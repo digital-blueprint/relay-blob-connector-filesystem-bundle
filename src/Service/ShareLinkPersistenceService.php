@@ -61,16 +61,11 @@ class ShareLinkPersistenceService
         return $sharedLinkPersistences;
     }
 
-    public function removeShareLinkPersistence(ShareLinkPersistence $shareLinkPersistence)
-    {
-        $this->em->remove($shareLinkPersistence);
-        $this->em->flush();
-    }
-
     public function removeShareLinkPersistences(array $shareLinkPersistences)
     {
         foreach ($shareLinkPersistences as $shareLinkPersistence) {
-            $this->removeShareLinkPersistence($shareLinkPersistence);
+            $this->em->remove($shareLinkPersistence);
+            $this->em->flush();
         }
     }
 

@@ -44,17 +44,11 @@ class ShareLinkPersistence
      */
     private $filesystemPath;
 
-    /**
-     * @return mixed
-     */
     public function getIdentifier()
     {
         return $this->identifier;
     }
 
-    /**
-     * @param mixed $identifier
-     */
     public function setIdentifier($identifier): void
     {
         $this->identifier = $identifier;
