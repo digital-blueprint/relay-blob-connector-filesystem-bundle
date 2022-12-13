@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
-use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
@@ -107,20 +106,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 
         FileOperations::removeFile($path, $destinationFilenameArray['destination']);
-
-        return true;
-    }
-
-    public function removePathFromBucket(string $path, Bucket $bucket): bool
-    {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
-
-        return true;
-    }
-
-    public function removeBucket(Bucket $bucket): bool
-    {
-        throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Not implemented', 'blob-connector-filesystem:not-implemented');
 
         return true;
     }
