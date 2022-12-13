@@ -1,31 +1,17 @@
-Relay-API Bundle README Template
+Relay-Blob-Connector-Filesystem Bundle README
 ================================
 
+# DbpRelayBlobConnectorFilesystemBundle
+
+[GitLab](https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-connector-filesystem-bundle)
+
+This bundle is a connector bundle for the dbp-relay-blob-bundle. It implements the [`DatasystemProviderServiceInterface`](https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/blob/main/src/Service/DatasystemProviderServiceInterface.php) of the blob bundle.
+It can save files to a specific path, rename those files, remove those files, or return short-lived sharelinks.
+
+## Requirements
+You need a DbpRelayBlobConnector bundle installed to make this bundle working. E.g. [DbpRelayBlobConnectorFilesystemBundle] (https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-connector-filesystem-bundle)
+
 <!--
-This should act as a template README.md for a new Relay-API Bundle.
-Just remove the parts that are not relevant to your bundle and
-replace placeholders like "{{Name}}" with your bundle name and so on.
-
-List of placeholders:
-- {{name}}: Name of the bundle in lowercase, like "formalize"
-- {{Name}}: Name of the bundle in camel case, like "Formalize"
-- {{NAME}}: Name of the bundle in uppercase, like "FORMALIZE"
-- {{bundle-path}}: GitLab bundle repository path, like "dbp/formalize/dbp-relay-formalize-bundle"
-- {{package-name}}: Name of the bundle for packagist, like "dbp/relay-formalize-bundle"
-- {{app-path}}: GitLab repository path of the frontend application, like "dbp/formalize/formalize"
--->
-
-# DbpRelay{{Name}}Bundle
-
-[GitLab](https://gitlab.tugraz.at/{{bundle-path}}) |
-[Packagist](https://packagist.org/packages/{{package-name}}) |
-[Frontend Application](https://gitlab.tugraz.at/{{app-path}}) |
-[{{Name}} Website](https://dbp-demo.tugraz.at/site/software/{{name}}.html)
-
-The {{name}} bundle provides an API for interacting with ...
-
-There is a corresponding frontend application that uses this API at [{{Name}} Frontend Application](https://gitlab.tugraz.at/{{app-path}}).
-
 ## Bundle installation
 
 You can install the bundle directly from [packagist.org](https://packagist.org/packages/{{package-name}}).
@@ -33,14 +19,15 @@ You can install the bundle directly from [packagist.org](https://packagist.org/p
 ```bash
 composer require {{package-name}}
 ```
-
+-->
 ## Integration into the Relay API Server
 
 * Add the bundle to your `config/bundles.php` in front of `DbpRelayCoreBundle`:
 
 ```php
 ...
-Dbp\Relay\{{Name}}Bundle\DbpRelay{{Name}}Bundle::class => ['all' => true],
+Dbp\Relay\BlobBundle\DbpRelayBlobConnectorFilesystemBundle::class => ['all' => true],
+Dbp\Relay\BlobBundle\DbpRelayBlobBundle::class => ['all' => true],
 Dbp\Relay\CoreBundle\DbpRelayCoreBundle::class => ['all' => true],
 ];
 ```
@@ -52,20 +39,19 @@ as template for your Symfony application, then this should have already been gen
 
 ## Configuration
 
-The bundle has a `database_url` configuration value that you can specify in your
+The bundle has multiple configuration values that you can specify in your
 app, either by hard-coding it, or by referencing an environment variable.
 
-For this create `config/packages/dbp_relay_{{name}}.yaml` in the app with the following
+For this create `config/packages/dbp_relay_blob_connector_filesystem.yaml` in the app with the following
 content:
 
 ```yaml
-dbp_relay_{{name}}:
-  database_url: 'mysql://db:secret@mariadb:3306/db?serverVersion=mariadb-10.3.30'
-  # database_url: %env({{NAME}}_DATABASE_URL)%
+dbp_relay_blob_connector_filesystem:
+  database_url: '%env(resolve:DATABASE_URL)%'
+  path: '%kernel.project_dir%/var/blobFiles' # path where files should be placed
+  link_url: 'http://localhost:8000/' # base link_url of the api
+  link_expire_time: 'P7D' # default max expire time of sharelinks in ISO 8601 can be overwritten by bucket config of blob bundle
 ```
-
-If you were using the [DBP API Server Template](https://gitlab.tugraz.at/dbp/relay/dbp-relay-server-template)
-as template for your Symfony application, then the configuration file should have already been generated for you.
 
 For more info on bundle configuration see <https://symfony.com/doc/current/bundles/configuration.html>.
 
@@ -81,8 +67,9 @@ For more info on bundle configuration see <https://symfony.com/doc/current/bundl
 Don't forget you need to pull down your dependencies in your main application if you are installing packages in a bundle.
 
 ```bash
-# updates and installs dependencies of {{package-name}}
-composer update {{package-name}}
+# updates and installs dependencies of dbp/relay-blob-bundle and dbp/relay-blob-connector-filesystem-bundle
+composer update dbp/relay-blob-bundle
+composer update dbp/relay-blob-connector-filesystem-bundle
 ```
 
 ## Scripts
@@ -93,69 +80,32 @@ Run this script to migrate the database. Run this script after installation of t
 after every update to adapt the database to the new source code.
 
 ```bash
-php bin/console doctrine:migrations:migrate --em=dbp_relay_{{name}}_bundle
+php bin/console doctrine:migrations:migrate --em=dbp_relay_blob_connector_filesystem_bundle
 ```
+
+## Functionality
+
+### `/blob/filesystem/{identifier}`
+
+#### GET
+Returns a binary file response of a sharelink id if the sharelink is valid and it exists
 
 ## Error codes
 
-### `/{{name}}/submissions`
+| relay:errorId                                  | Status code | Description                      | relay:errorDetails | Example                          |
+|------------------------------------------------|-------------|----------------------------------| ------------------ |----------------------------------|
+| `blobConnectorFilesystem:no-identifier-set`    | 400         | No identifier set                | `message`          | |
+| `blobConnectorFilesystem:download-file`        | 400         | No file with this share id found | `message`          | |
+| `blob-connector-filesystem:save-file-error`    | 400         | File could not be uploaded       | `message`          | |
+| `blob-connector-filesystem:generate-sharelink-error`    | 400         | Sharelink could not generated    | `message`          | |
+| `blob-connector-filesystem:fileshare-not-found`    | 403         | Fileshare was not found!                                 | `message`          | |
+| `blob-connector-filesystem:path-not-generated` | 500         | Path could not be generated      | `message`          | |
+| `blob-connector-filesystem:sharelink-not-saved` | 500         | ShareLink could not be saved!    | `message`          | |
 
-#### POST
 
-| relay:errorId                       | Status code | Description                                     | relay:errorDetails | Example                          |
-|-------------------------------------|-------------|-------------------------------------------------| ------------------ |----------------------------------|
-| `{{name}}:submission-not-created`  | 500         | The submission could not be created.            | `message`          | `['message' => 'Error message']` |
-| `{{name}}:submission-invalid-json` | 422         | The dataFeedElement doesn't contain valid json. | `message`          |                                  |
 
-### `/{{name}}/submissions/{identifier}`
+## CronJobs
 
-#### GET
+### Cleanup Cronjob
+`Blob Connector Filesystem Database cleanup`: This cronjob is for cleanup purposes. It deletes all invalid sharelinks and starts every hour.
 
-| relay:errorId                    | Status code | Description               | relay:errorDetails | Example |
-| -------------------------------- | ----------- | ------------------------- | ------------------ | ------- |
-| `{{name}}:submission-not-found` | 404         | Submission was not found. |                    |         |
-
-## Roles
-
-This bundle needs the role `ROLE_SCOPE_{{NAME}}` assigned to the user to get permissions to fetch data.
-To create a new submission entry the Symfony role `ROLE_SCOPE_{{NAME}}-POST` is required.
-
-## Events
-
-To extend the behavior of the bundle the following event is registered:
-
-### CreateSubmissionPostEvent
-
-This event allows you to react on submission creations.
-You can use this for example to email the submitter of the submission.
-
-An event subscriber receives a `Dbp\Relay\{{Name}}Bundle\Event\CreateSubmissionPostEvent` instance
-in a service for example in `src/EventSubscriber/CreateSubmissionSubscriber.php`:
-
-```php
-<?php
-
-namespace App\EventSubscriber;
-
-use Dbp\Relay\{{Name}}Bundle\Event\CreateSubmissionPostEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class CreateSubmissionSubscriber implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CreateSubmissionPostEvent::NAME => 'onPost',
-        ];
-    }
-
-    public function onPost(CreateSubmissionPostEvent $event)
-    {
-        $submission = $event->getSubmission();
-        $dataFeedElement = $submission->getDataFeedElementDecoded();
-
-        // TODO: extract email address and send email
-        $email = $dataFeedElement['email'];
-    }
-}
-```
