@@ -9,7 +9,8 @@
         "api-platform/core": "^2.6",
         "dbp/relay-core-bundle": "^v0.1.56",
         "dbp/relay-blob-bundle": "dev-main",
-        "symfony/framework-bundle": "^5.4"
+        "symfony/framework-bundle": "^5.4",
+        "doctrine/dbal": "^3.3"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
