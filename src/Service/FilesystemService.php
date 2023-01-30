@@ -10,7 +10,6 @@ use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -18,11 +17,6 @@ use Symfony\Component\Uid\Uuid;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
     /**
      * @var ConfigurationService
      */
@@ -45,7 +39,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $this->slugger = $slugger;
     }
 
-    public function saveFile(FileData &$fileData): ?FileData
+    /**
+     * @throws \Exception
+     */
+    public function saveFile(FileData $fileData): ?FileData
     {
         try {
             $destinationFilenameArray = $this->generatePath($fileData);
@@ -56,11 +53,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
         //Upload file
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
-        //generate link
+        //generate shareLink
         try {
             $shareLinkPersistence = $this->generateShareLink($fileData, $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
         } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-sharelink-error');
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-shareLink-error');
         }
 
         $fileData->setContentUrl($shareLinkPersistence->getLink());
@@ -71,13 +68,16 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
-    public function renameFile(FileData &$fileData): ?FileData
+    public function renameFile(FileData $fileData): ?FileData
     {
-        // Nothing todo here beause its only saved in blobBundle
+        // No action required here because it is only saved in blobBundle
         return $fileData;
     }
 
-    public function getLink(FileData &$fileData, PoliciesStruct $policiesStruct): ?FileData
+    /**
+     * @throws \Exception
+     */
+    public function getLink(FileData $fileData, PoliciesStruct $policiesStruct): ?FileData
     {
         try {
             $destinationFilenameArray = $this->generatePath($fileData);
@@ -87,17 +87,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
         try {
             $shareLinkPersistence = $this->generateShareLink($fileData, $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
         } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-sharelink-error');
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-shareLink-error');
         }
         $fileData->setContentUrl($shareLinkPersistence->getLink());
 
-        // Save sharelink to database
+        // Save shareLink to database
         $this->shareLinkPersistenceService->saveShareLinkPersistence($shareLinkPersistence);
 
         return $fileData;
     }
 
-    public function removeFile(FileData &$fileData): bool
+    public function removeFile(FileData $fileData): bool
     {
         // Delete ShareLinks
         $this->shareLinkPersistenceService->removeShareLinkPersistencesByFileDataID($fileData->getIdentifier());
@@ -137,6 +137,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $link.'blob/filesystem/'.$id;
     }
 
+    /**
+     * @throws \Exception
+     */
     private function generateShareLink(FileData $fileData, string $path): ShareLinkPersistence
     {
         $shareLinkId = (string) Uuid::v4();
