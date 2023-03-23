@@ -233,17 +233,11 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-blob-bundle.git",
-                "reference": "73cbd24896596a35ca7a26afdceee55c88d7bc86"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-blob-bundle/repository/archive.zip?sha=73cbd24896596a35ca7a26afdceee55c88d7bc86",
-                "reference": "73cbd24896596a35ca7a26afdceee55c88d7bc86",
-                "shasum": ""
+                "reference": "079dafa6a0bb66fff6993b3597f1935331f83a7b"
             },
             "require": {
                 "api-platform/core": "^2.6",
-                "dbp/relay-core-bundle": "^0.1.56",
+                "dbp/relay-core-bundle": "^0.1.91",
                 "doctrine/dbal": "^3.3",
                 "ext-json": "*",
                 "fgrosse/phpasn1": "^2.0",
@@ -313,24 +307,20 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "A bundle for fileserving, persisting and managing",
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/tree/main",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/issues"
-            },
-            "time": "2023-02-15T11:47:56+01:00"
+            "time": "2023-03-23T12:38:14+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.90",
+            "version": "v0.1.91",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "da90f97ea72c6e0361fa18de31dc0e0c141b1376"
+                "reference": "9a93c21af9466b47f9763420d668f49c5bf08ac8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/da90f97ea72c6e0361fa18de31dc0e0c141b1376",
-                "reference": "da90f97ea72c6e0361fa18de31dc0e0c141b1376",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/9a93c21af9466b47f9763420d668f49c5bf08ac8",
+                "reference": "9a93c21af9466b47f9763420d668f49c5bf08ac8",
                 "shasum": ""
             },
             "require": {
@@ -398,9 +388,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.90"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.91"
             },
-            "time": "2023-03-06T13:46:06+00:00"
+            "time": "2023-03-23T08:54:16+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -12434,5 +12424,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
