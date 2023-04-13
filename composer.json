@@ -7,10 +7,10 @@
         "php": ">=7.3",
         "ext-json": "*",
         "api-platform/core": "^2.6",
-        "dbp/relay-core-bundle": "^v0.1.56",
         "dbp/relay-blob-bundle": "dev-main",
-        "symfony/framework-bundle": "^5.4",
-        "doctrine/dbal": "^3.3"
+        "dbp/relay-core-bundle": "^v0.1.56",
+        "doctrine/dbal": "^3.3",
+        "symfony/framework-bundle": "^5.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
