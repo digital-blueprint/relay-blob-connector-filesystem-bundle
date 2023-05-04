@@ -28,7 +28,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-blob-bundle.git"
+            "url": "https://github.com/digital-blueprint/relay-blob-bundle.git"
         }
     ],
     "autoload": {

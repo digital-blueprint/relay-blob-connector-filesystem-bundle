@@ -3,13 +3,13 @@ Relay-Blob-Connector-Filesystem Bundle README
 
 # DbpRelayBlobConnectorFilesystemBundle
 
-[GitLab](https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-connector-filesystem-bundle)
+[GitHub](https://github.com/digital-blueprint/relay-blob-connector-filesystem-bundle)
 
-This bundle is a connector bundle for the dbp-relay-blob-bundle. It implements the [`DatasystemProviderServiceInterface`](https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-bundle/-/blob/main/src/Service/DatasystemProviderServiceInterface.php) of the blob bundle.
+This bundle is a connector bundle for the dbp-relay-blob-bundle. It implements the [`DatasystemProviderServiceInterface`](https://github.com/digital-blueprint/relay-blob-bundle/blob/main/src/Service/DatasystemProviderServiceInterface.php) of the blob bundle.
 It can save files to a specific path, rename those files, remove those files, or return short-lived sharelinks.
 
 ## Requirements
-You need a DbpRelayBlobConnector bundle installed to make this bundle working. E.g. [DbpRelayBlobConnectorFilesystemBundle] (https://gitlab.tugraz.at/dbp/relay/dbp-relay-blob-connector-filesystem-bundle)
+You need a DbpRelayBlobConnector bundle installed to make this bundle working. E.g. [DbpRelayBlobBundle](https://github.com/digital-blueprint/relay-blob-bundle)
 
 <!--
 ## Bundle installation
@@ -32,7 +32,7 @@ Dbp\Relay\CoreBundle\DbpRelayCoreBundle::class => ['all' => true],
 ];
 ```
 
-If you were using the [DBP API Server Template](https://gitlab.tugraz.at/dbp/relay/dbp-relay-server-template)
+If you were using the [DBP API Server Template](https://github.com/digital-blueprint/relay-server-template)
 as template for your Symfony application, then this should have already been generated for you.
 
 * Run `composer install` to clear caches
