@@ -7,13 +7,14 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Entity\ShareLinkPersistence;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
+use Dbp\Relay\BlobBundle\Service\BlobService;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -23,20 +24,20 @@ class FilesystemService implements DatasystemProviderServiceInterface
     private $configurationService;
 
     /**
-     * @var ShareLinkPersistenceService
-     */
-    private $shareLinkPersistenceService;
-
-    /**
      * @var SluggerInterface
      */
     private $slugger;
 
-    public function __construct(ConfigurationService $configurationService, ShareLinkPersistenceService $shareLinkPersistenceService, SluggerInterface $slugger)
+    /**
+     * @var BlobService
+     */
+    private $blobService;
+
+    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger, BlobService $blobService)
     {
         $this->configurationService = $configurationService;
-        $this->shareLinkPersistenceService = $shareLinkPersistenceService;
         $this->slugger = $slugger;
+        $this->blobService = $blobService;
     }
 
     /**
@@ -50,20 +51,26 @@ class FilesystemService implements DatasystemProviderServiceInterface
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
 
+        $payload = [
+            'identifier' => $fileData->getIdentifier(),
+            'validUntil' => $fileData->getExistsUntil()->format('c'),
+            'path' => $destinationFilenameArray
+        ];
+        $contentUrl = $contentUrl = $this->configurationService->getLinkUrl().'blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
+
+        $contentUrl = $contentUrl.'&checksum='.hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
+        
+        $fileData->setContentUrl($contentUrl);
+
+        dump($fileData->getIdentifier());
+        dump($fileData->getExistsUntil());
+
         //Upload file
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
-        //generate shareLink
-        try {
-            $shareLinkPersistence = $this->generateShareLink($fileData, $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
-        } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-shareLink-error');
-        }
-
-        $fileData->setContentUrl($shareLinkPersistence->getLink());
-
-        //save data to database
-        $this->shareLinkPersistenceService->saveShareLinkPersistence($shareLinkPersistence);
+        $this->blobService->saveFileData($fileData);
+        $this->blobService->saveFile($fileData);
+        dump($this->blobService->getFileDataByBucketIDAndPrefixWithPagination($fileData->getBucketID(), $fileData->getPrefix(), 1, 10));
 
         return $fileData;
     }
@@ -84,24 +91,23 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
-        try {
-            $shareLinkPersistence = $this->generateShareLink($fileData, $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']);
-        } catch (FileException $e) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'Sharelink could not generated', 'blob-connector-filesystem:generate-shareLink-error');
-        }
-        $fileData->setContentUrl($shareLinkPersistence->getLink());
+        $payload = [
+            'identifier' => $fileData->getIdentifier(),
+            'validUntil' => $fileData->getExistsUntil()->format('c'),
+            'path' => $destinationFilenameArray
+        ];
 
-        // Save shareLink to database
-        $this->shareLinkPersistenceService->saveShareLinkPersistence($shareLinkPersistence);
+        $contentUrl = '/blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
+
+        $contentUrl = $contentUrl.'&checksum='.hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
+
+        $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
     }
 
     public function removeFile(FileData $fileData): bool
     {
-        // Delete ShareLinks
-        $this->shareLinkPersistenceService->removeShareLinkPersistencesByFileDataID($fileData->getIdentifier());
-
         // Delete the file
         $destinationFilenameArray = $this->generatePath($fileData);
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
@@ -109,6 +115,29 @@ class FilesystemService implements DatasystemProviderServiceInterface
         FileOperations::removeFile($path, $destinationFilenameArray['destination']);
 
         return true;
+    }
+
+    public function generateChecksum($fileData): ?string
+    {
+        try {
+            $destinationFilenameArray = $this->generatePath($fileData);
+        } catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
+        }
+
+        $payload = [
+            'identifier' => $fileData->getIdentifier(),
+            'validUntil' => $fileData->getExistsUntil()->format('c'),
+            'path' => $destinationFilenameArray
+        ];
+
+        $contentUrl = '/blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
+
+        dump($contentUrl.$fileData->getBucket()->getPublicKey());
+
+        $cs = hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
+
+        return $cs;
     }
 
     private function generatePath(FileData $fileData): array
@@ -137,33 +166,13 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $link.'blob/filesystem/'.$id;
     }
 
-    /**
-     * @throws \Exception
-     */
-    private function generateShareLink(FileData $fileData, string $path): ShareLinkPersistence
+    private function generateContentUrlWithExpiry(string $id, string $validUntil): string
     {
-        $shareLinkId = (string) Uuid::v4();
-        $shareLink = new ShareLinkPersistence();
-        $shareLink->setIdentifier($shareLinkId);
-        $shareLink->setFileDataIdentifier($fileData->getIdentifier());
-        $contentUrl = $this->generateContentUrl($shareLinkId);
-        $shareLink->setLink($contentUrl);
+        return $this->generateContentUrl($id).'&validUntil='.$validUntil;
+    }
 
-        // Create a valid until date
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-
-        if ($fileData->getBucket() && $fileData->getBucket()->getLinkExpireTime() !== null) {
-            $linkExpireTime = $fileData->getBucket()->getLinkExpireTime();
-        } else {
-            $linkExpireTime = $this->configurationService->getLinkExpireTime();
-        }
-
-        $validUntil = $now->add(new \DateInterval($linkExpireTime));
-
-        $shareLink->setValidUntil($validUntil);
-
-        $shareLink->setFilesystemPath($path);
-
-        return $shareLink;
+    private function generateSignedContentUrl(string $id, string $validUntil, string $signature): string
+    {
+        return $this->generateContentUrlWithExpiry($id, $validUntil).'&sig='.$signature;
     }
 }

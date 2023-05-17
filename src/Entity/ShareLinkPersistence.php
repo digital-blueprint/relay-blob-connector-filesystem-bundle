@@ -8,41 +8,35 @@ date_default_timezone_set('UTC');
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="blob_connector_filesystem")
- */
 class ShareLinkPersistence
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string", length=50, unique=true)
-     */
+
     private $identifier;
 
     /**
      * @var \DateTimeImmutable
-     * @ORM\Column(type="datetime_immutable")
      */
     private $validUntil;
 
     /**
      * @var string
-     * @ORM\Column(type="string")
      */
     private $link;
 
     /**
      * @var string
-     * @ORM\Column(name="file_data_identifier", type="string")
      */
     private $fileDataIdentifier;
 
     /**
      * @var string
-     * @ORM\Column(name="filesystem_path", type="string")
      */
     private $filesystemPath;
+
+    /**
+     * @var string
+     */
+    private $signature;
 
     public function getIdentifier()
     {
@@ -92,5 +86,15 @@ class ShareLinkPersistence
     public function setFilesystemPath(string $filesystemPath): void
     {
         $this->filesystemPath = $filesystemPath;
+    }
+
+    public function getSignature(): string
+    {
+        return $this->signature;
+    }
+
+    public function setSignature(string $signature): void
+    {
+        $this->signature = $signature;
     }
 }

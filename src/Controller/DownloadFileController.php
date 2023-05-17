@@ -5,53 +5,59 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Controller;
 
 use Dbp\Relay\BlobBundle\Service\BlobService;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ShareLinkPersistenceService;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use function PHPUnit\Framework\throwException;
+
 
 class DownloadFileController extends AbstractController
 {
-    /**
-     * @var ShareLinkPersistenceService
-     */
-    private $shareLinkPersistenceService;
-
     /**
      * @var BlobService
      */
     private $blobService;
 
-    public function __construct(ShareLinkPersistenceService $shareLinkPersistenceService, BlobService $blobService)
+    public function __construct(BlobService $blobService)
     {
-        $this->shareLinkPersistenceService = $shareLinkPersistenceService;
         $this->blobService = $blobService;
     }
 
-    public function index(string $identifier): Response
+    public function index(Request $request, string $identifier): Response
     {
         if (!$identifier) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No identifier set', 'blobConnectorFilesystem:no-identifier-set');
         }
 
-        $sharedLinkPersistence = $this->shareLinkPersistenceService->getShareLinkPersistence($identifier);
-        if (!$sharedLinkPersistence) {
-            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No file with this share id found', 'blobConnectorFilesystem:download-file');
-        }
-
         // Check if sharelink is already invalid
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
-        if ($now > $sharedLinkPersistence->getValidUntil()) {
+        $fileData = $this->blobService->getFileData($identifier);
+        $this->blobService->setBucket($fileData);
+
+        if ($now > $fileData->getExistsUntil()) {
+            dump("file NOT found");
             return $this->fileNotFoundResponse();
         }
 
-        $filePath = $sharedLinkPersistence->getFilesystemPath();
+        dump($fileData);
+        dump($request->getPathInfo());
+        dump($this->blobService->getChecksum($fileData));
+        dump($request->query->get('checksum', ''));
+        dump(str_replace(" ", "+", $request->query->get('validUntil', '')));
+        dump($request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey());
+        dump(hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey()));
+        if(hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey()) !== $request->query->get('checksum', '') || $request->query->get('checksum', '') !== $this->blobService->getChecksum($fileData)) {
+            throw ApiError::withDetails(Response::HTTP_FORBIDDEN, 'Checksum is not the same!', 'blob:bad-checksum');
+        }
+
+        $filePath = $request->query->get('path', '');
 
         $response = new BinaryFileResponse($filePath);
 
@@ -66,7 +72,7 @@ class DownloadFileController extends AbstractController
             $response->headers->set('Content-Type', 'text/plain');
         }
 
-        $filename = $this->blobService->getFileData($sharedLinkPersistence->getFileDataIdentifier())->getFileName();
+        $filename = $fileData->getFileName();
 
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
@@ -88,5 +94,10 @@ class DownloadFileController extends AbstractController
         $response->setContent($content);
 
         return $response;
+    }
+
+    private function checkChecksum(): bool
+    {
+
     }
 }

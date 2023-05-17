@@ -16,9 +16,9 @@ class SharedFile
     private $identifier;
 
     /**
-     * @var ShareLinkPersistence
+     * @var string
      */
-    private $shareLink; // TODO dont know if we need this here
+    private $filePath;
 
     /**
      * @Groups({"BlobConnectorFilesystem:output"})
@@ -37,14 +37,14 @@ class SharedFile
         $this->identifier = $identifier;
     }
 
-    public function getShareLink(): ShareLinkPersistence
+    public function getFilePath(): string
     {
-        return $this->shareLink;
+        return $this->filePath;
     }
 
-    public function setShareLink(ShareLinkPersistence $shareLink): void
+    public function setFilePath(string $filePath): void
     {
-        $this->shareLink = $shareLink;
+        $this->filePath = $filePath;
     }
 
     public function getBinaryFileResponse(): BinaryFileResponse
