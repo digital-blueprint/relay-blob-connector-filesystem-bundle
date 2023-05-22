@@ -46,13 +46,6 @@ class DownloadFileController extends AbstractController
             return $this->fileNotFoundResponse();
         }
 
-        dump($fileData);
-        dump($request->getPathInfo());
-        dump($this->blobService->getChecksum($fileData));
-        dump($request->query->get('checksum', ''));
-        dump(str_replace(" ", "+", $request->query->get('validUntil', '')));
-        dump($request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey());
-        dump(hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey()));
         if(hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey()) !== $request->query->get('checksum', '') || $request->query->get('checksum', '') !== $this->blobService->getChecksum($fileData)) {
             throw ApiError::withDetails(Response::HTTP_FORBIDDEN, 'Checksum is not the same!', 'blob:bad-checksum');
         }

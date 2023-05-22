@@ -62,15 +62,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
         
         $fileData->setContentUrl($contentUrl);
 
-        dump($fileData->getIdentifier());
-        dump($fileData->getExistsUntil());
-
         //Upload file
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
         $this->blobService->saveFileData($fileData);
         $this->blobService->saveFile($fileData);
-        dump($this->blobService->getFileDataByBucketIDAndPrefixWithPagination($fileData->getBucketID(), $fileData->getPrefix(), 1, 10));
 
         return $fileData;
     }
@@ -132,8 +128,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         ];
 
         $contentUrl = '/blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
-
-        dump($contentUrl.$fileData->getBucket()->getPublicKey());
 
         $cs = hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
 
