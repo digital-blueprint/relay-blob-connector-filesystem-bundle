@@ -50,6 +50,7 @@ class DownloadFileController extends AbstractController
             throw ApiError::withDetails(Response::HTTP_FORBIDDEN, 'Checksum is not the same!', 'blob:bad-checksum');
         }
 
+        /** @var string */
         $filePath = $request->query->get('path', '');
 
         $response = new BinaryFileResponse($filePath);
@@ -87,10 +88,5 @@ class DownloadFileController extends AbstractController
         $response->setContent($content);
 
         return $response;
-    }
-
-    private function checkChecksum(): bool
-    {
-
     }
 }

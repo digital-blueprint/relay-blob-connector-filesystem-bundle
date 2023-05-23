@@ -10,6 +10,7 @@ use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
+use Safe\DateTimeImmutable;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -28,16 +29,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private $slugger;
 
-    /**
-     * @var BlobService
-     */
-    private $blobService;
-
-    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger, BlobService $blobService)
+    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger)
     {
         $this->configurationService = $configurationService;
         $this->slugger = $slugger;
-        $this->blobService = $blobService;
     }
 
     /**
@@ -53,6 +48,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         $payload = [
             'identifier' => $fileData->getIdentifier(),
+            /** @var DateTimeImmutable */
             'validUntil' => $fileData->getExistsUntil()->format('c'),
             'path' => $destinationFilenameArray
         ];
@@ -64,9 +60,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         //Upload file
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
-
-        $this->blobService->saveFileData($fileData);
-        $this->blobService->saveFile($fileData);
 
         return $fileData;
     }
