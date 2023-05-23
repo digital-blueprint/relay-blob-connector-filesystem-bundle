@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
-use Dbp\Relay\BlobBundle\Service\BlobService;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
