@@ -45,19 +45,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
 
-        $payload = [
-            'identifier' => $fileData->getIdentifier(),
-            /** @var DateTimeImmutable */
-            'validUntil' => $fileData->getExistsUntil()->format('c'),
-            'path' => $destinationFilenameArray
-        ];
-        $contentUrl = $contentUrl = $this->configurationService->getLinkUrl().'blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
-
-        $contentUrl = $contentUrl.'&checksum='.hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
-        
+        // set content url
+        $contentUrl = $contentUrl = $this->configurationService->getLinkUrl().'blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c').'&path='.$destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+        $contentUrl = $contentUrl.'&checksum='.$this->generateChecksumFromFileData($fileData);
         $fileData->setContentUrl($contentUrl);
 
-        //Upload file
+        //move file to correct destination
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
         return $fileData;
@@ -79,15 +72,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
-        $payload = [
-            'identifier' => $fileData->getIdentifier(),
-            'validUntil' => $fileData->getExistsUntil()->format('c'),
-            'path' => $destinationFilenameArray
-        ];
 
-        $contentUrl = '/blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
-
-        $contentUrl = $contentUrl.'&checksum='.hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
+        // set content url
+        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c').'&path='.$destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+        $contentUrl = $contentUrl.'&checksum='.$this->generateChecksumFromFileData($fileData);
 
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
@@ -105,7 +93,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
-    public function generateChecksum($fileData): ?string
+    public function generateChecksumFromFileData($fileData): ?string
     {
         try {
             $destinationFilenameArray = $this->generatePath($fileData);
@@ -113,14 +101,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
 
-        $payload = [
-            'identifier' => $fileData->getIdentifier(),
-            'validUntil' => $fileData->getExistsUntil()->format('c'),
-            'path' => $destinationFilenameArray
-        ];
+        // create url to hash
+        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c').'&path='.$destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 
-        $contentUrl = '/blob/filesystem/'.$payload['identifier'].'?validUntil='.$payload['validUntil'].'&path='.$payload['path']['destination'].'/'.$payload['path']['filename'];
-
+        // create sha256 hash
         $cs = hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
 
         return $cs;

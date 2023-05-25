@@ -41,20 +41,23 @@ class DownloadFileController extends AbstractController
         $fileData = $this->blobService->getFileData($identifier);
         $this->blobService->setBucket($fileData);
 
-        if ($now > $fileData->getExistsUntil()) {
-            dump("file NOT found");
-            return $this->fileNotFoundResponse();
+        // check if request checksum is correct for all url parameters and check if it is correct for the data that is saved in the database
+        // both checks are needed, because otherwise the sender could just send a valid checksum with invalid parameters
+        if($request->query->get('checksum', '') !== $this->blobService->getChecksumFromFileData($fileData) || $request->query->get('checksum', '') !== $this->generateChecksumFromRequest($request, $fileData->getBucket()->getPublicKey())) {
+            throw ApiError::withDetails(Response::HTTP_FORBIDDEN, 'Checksum is not the same!', 'blob:bad-checksum');
         }
 
-        if(hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$fileData->getBucket()->getPublicKey()) !== $request->query->get('checksum', '') || $request->query->get('checksum', '') !== $this->blobService->getChecksum($fileData)) {
-            throw ApiError::withDetails(Response::HTTP_FORBIDDEN, 'Checksum is not the same!', 'blob:bad-checksum');
+        // check if file is expired or got deleted
+        if ($now > $fileData->getExistsUntil() || !file_exists($request->query->get('path', ''))) {
+            dump("file " + $request->query->get('path', '') +  " NOT found");
+            return $this->fileNotFoundResponse();
         }
 
         /** @var string */
         $filePath = $request->query->get('path', '');
 
+        // build binary response
         $response = new BinaryFileResponse($filePath);
-
         $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
         // Set the mimetype with the guesser or manually
@@ -88,5 +91,10 @@ class DownloadFileController extends AbstractController
         $response->setContent($content);
 
         return $response;
+    }
+
+    public function generateChecksumFromRequest($request, $secret): string
+    {
+        return hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$secret);
     }
 }
