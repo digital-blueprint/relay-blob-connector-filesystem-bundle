@@ -46,7 +46,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         // set content url
-        $contentUrl = $contentUrl = $this->configurationService->getLinkUrl().'blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c').'&path='.$destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+        $contentUrl = $contentUrl = $this->configurationService->getLinkUrl().'blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c');
         $contentUrl = $contentUrl.'&checksum='.$this->generateChecksumFromFileData($fileData);
         $fileData->setContentUrl($contentUrl);
 
@@ -74,7 +74,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         // set content url
-        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c').'&path='.$destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c');
         $contentUrl = $contentUrl.'&checksum='.$this->generateChecksumFromFileData($fileData);
 
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
@@ -102,10 +102,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         // create url to hash
-        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c').'&path='.$destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c');
 
         // create sha256 hash
-        $cs = hash('sha256', $contentUrl.$fileData->getBucket()->getPublicKey());
+        $cs = hash_hmac('sha256', $contentUrl, $fileData->getBucket()->getPublicKey());
 
         return $cs;
     }

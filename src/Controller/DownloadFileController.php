@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Controller;
 
 use Dbp\Relay\BlobBundle\Service\BlobService;
+use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -24,9 +25,10 @@ class DownloadFileController extends AbstractController
      */
     private $blobService;
 
-    public function __construct(BlobService $blobService)
+    public function __construct(BlobService $blobService, ConfigurationService $configurationService)
     {
         $this->blobService = $blobService;
+        $this->configurationService = $configurationService;
     }
 
     public function index(Request $request, string $identifier): Response
@@ -37,7 +39,6 @@ class DownloadFileController extends AbstractController
 
         // Check if sharelink is already invalid
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-
         $fileData = $this->blobService->getFileData($identifier);
         $this->blobService->setBucket($fileData);
 
@@ -48,13 +49,13 @@ class DownloadFileController extends AbstractController
         }
 
         // check if file is expired or got deleted
-        if ($now > $fileData->getExistsUntil() || !file_exists($request->query->get('path', ''))) {
-            dump("file " + $request->query->get('path', '') +  " NOT found");
+        if ($now > $fileData->getExistsUntil() || !file_exists($this->getPath($fileData))) {
+            dump("file ".$this->getPath($fileData)." NOT found");
             return $this->fileNotFoundResponse();
         }
 
         /** @var string */
-        $filePath = $request->query->get('path', '');
+        $filePath = $this->getPath($fileData);
 
         // build binary response
         $response = new BinaryFileResponse($filePath);
@@ -95,6 +96,11 @@ class DownloadFileController extends AbstractController
 
     public function generateChecksumFromRequest($request, $secret): string
     {
-        return hash('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')).'&path='.$request->query->get('path', '').$secret);
+        return hash_hmac('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')), $secret);
+    }
+
+    public function getPath($fileData): string
+    {
+        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getPath().'/'.\Safe\substr($fileData->getIdentifier(),0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
     }
 }
