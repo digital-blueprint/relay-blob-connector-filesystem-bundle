@@ -25,6 +25,11 @@ class DownloadFileController extends AbstractController
      */
     private $blobService;
 
+    /**
+     * @var ConfigurationService
+     */
+    private $configurationService;
+
     public function __construct(BlobService $blobService, ConfigurationService $configurationService)
     {
         $this->blobService = $blobService;
@@ -101,6 +106,6 @@ class DownloadFileController extends AbstractController
 
     public function getPath($fileData): string
     {
-        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getPath().'/'.\Safe\substr($fileData->getIdentifier(),0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
+        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getPath().'/'.substr($fileData->getIdentifier(),0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
     }
 }
