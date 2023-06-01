@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
-use Monolog\DateTimeImmutable;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Validator\Constraints\Date;
 
 class FilesystemServiceTest extends WebTestCase
@@ -91,7 +91,7 @@ class FilesystemServiceTest extends WebTestCase
         $fileData->setExtension('pdf');
         $fileData->setBucket($bucket);
 
-        $now = new DateTimeImmutable(false);
+        $now = new \DateTimeImmutable('now');
 
         $fileData->setExistsUntil($now->add(new \DateInterval($bucket->getMaxRetentionDuration())));
 
