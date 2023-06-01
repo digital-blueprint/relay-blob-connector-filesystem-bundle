@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Controller;
 
+use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
 use Dbp\Relay\BlobBundle\Service\BlobService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
@@ -46,15 +47,18 @@ class DownloadFileController extends AbstractController
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $fileData = $this->blobService->getFileData($identifier);
         $this->blobService->setBucket($fileData);
+        $validUntil = new \DateTimeImmutable(str_replace(" ", "+", $request->query->get('validUntil', '')));
 
-        // check if request checksum is correct for all url parameters and check if it is correct for the data that is saved in the database
-        // both checks are needed, because otherwise the sender could just send a valid checksum with invalid parameters
-        if($request->query->get('checksum', '') !== $this->blobService->getChecksumFromFileData($fileData) || $request->query->get('checksum', '') !== $this->generateChecksumFromRequest($request, $fileData->getBucket()->getPublicKey())) {
-            throw ApiError::withDetails(Response::HTTP_FORBIDDEN, 'Checksum is not the same!', 'blob:bad-checksum');
+        DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getPublicKey(), $request->query->get('sig', ''), $request);
+
+        // check if file is expired or got deleted
+        if ($now >  $validUntil) {
+            dump("link expired!");
+            return $this->fileNotFoundResponse();
         }
 
         // check if file is expired or got deleted
-        if ($now > $fileData->getExistsUntil() || !file_exists($this->getPath($fileData))) {
+        if ($now > $fileData->getExistsUntil() || !file_exists($this->getPath($fileData)) ) {
             dump("file ".$this->getPath($fileData)." NOT found");
             return $this->fileNotFoundResponse();
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
+use DateTimeZone;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
@@ -45,9 +46,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
 
+        // the file link should expire in the near future
+        // set the expire time
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
+
+        $payload = [
+            'identifier' => $fileData->getIdentifier(),
+            'validUntil' => $now,
+        ];
+
         // set content url
-        $contentUrl = $contentUrl = $this->configurationService->getLinkUrl().'blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c');
-        $contentUrl = $contentUrl.'&checksum='.$this->generateChecksumFromFileData($fileData);
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getPublicKey(), $payload));
         $fileData->setContentUrl($contentUrl);
 
         //move file to correct destination
@@ -67,16 +77,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     public function getLink(FileData $fileData, PoliciesStruct $policiesStruct): ?FileData
     {
-        try {
-            $destinationFilenameArray = $this->generatePath($fileData);
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
-        }
+        // the file link should expire in the near future
+        // set the expire time
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
+        
+        $payload = [
+            'cs' => $this->generateChecksumFromFileData($fileData, $now->format('c')),
+        ];
 
         // set content url
-        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c');
-        $contentUrl = $contentUrl.'&checksum='.$this->generateChecksumFromFileData($fileData);
-
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getPublicKey(), $payload));
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
@@ -93,19 +104,16 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
-    public function generateChecksumFromFileData($fileData): ?string
+    public function generateChecksumFromFileData($fileData, $validUntil): ?string
     {
-        try {
-            $destinationFilenameArray = $this->generatePath($fileData);
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
-        }
-
         // create url to hash
-        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$fileData->getExistsUntil()->format('c');
+        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$validUntil;
+
+        // create hmac sha256 keyed hash
+        //$cs = hash_hmac('sha256', $contentUrl, $fileData->getBucket()->getPublicKey());
 
         // create sha256 hash
-        $cs = hash_hmac('sha256', $contentUrl, $fileData->getBucket()->getPublicKey());
+        $cs = hash('sha256', $contentUrl);
 
         return $cs;
     }
@@ -133,12 +141,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
     {
         $link = $this->configurationService->getLinkUrl();
 
-        return $link.'blob/filesystem/'.$id;
+        return '/blob/filesystem/'.$id;
     }
 
     private function generateContentUrlWithExpiry(string $id, string $validUntil): string
     {
-        return $this->generateContentUrl($id).'&validUntil='.$validUntil;
+        return $this->generateContentUrl($id).'?validUntil='.$validUntil;
     }
 
     private function generateSignedContentUrl(string $id, string $validUntil, string $signature): string
