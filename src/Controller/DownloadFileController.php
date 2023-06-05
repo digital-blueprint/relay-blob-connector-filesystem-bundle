@@ -10,14 +10,12 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-use function PHPUnit\Framework\throwException;
-
 
 class DownloadFileController extends AbstractController
 {
@@ -47,19 +45,21 @@ class DownloadFileController extends AbstractController
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $fileData = $this->blobService->getFileData($identifier);
         $this->blobService->setBucket($fileData);
-        $validUntil = new \DateTimeImmutable(str_replace(" ", "+", $request->query->get('validUntil', '')));
+        $validUntil = new \DateTimeImmutable(str_replace(' ', '+', $request->query->get('validUntil', '')));
 
         DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getPublicKey(), $request->query->get('sig', ''), $request);
 
         // check if file is expired or got deleted
-        if ($now >  $validUntil) {
-            dump("link expired!");
+        if ($now > $validUntil) {
+            dump('link expired!');
+
             return $this->fileNotFoundResponse();
         }
 
         // check if file is expired or got deleted
-        if ($now > $fileData->getExistsUntil() || !file_exists($this->getPath($fileData)) ) {
-            dump("file ".$this->getPath($fileData)." NOT found");
+        if ($now > $fileData->getExistsUntil() || !file_exists($this->getPath($fileData))) {
+            dump('file '.$this->getPath($fileData).' NOT found');
+
             return $this->fileNotFoundResponse();
         }
 
@@ -105,11 +105,11 @@ class DownloadFileController extends AbstractController
 
     public function generateChecksumFromRequest($request, $secret): string
     {
-        return hash_hmac('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(" ", "+", $request->query->get('validUntil', '')), $secret);
+        return hash_hmac('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(' ', '+', $request->query->get('validUntil', '')), $secret);
     }
 
     public function getPath($fileData): string
     {
-        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getPath().'/'.substr($fileData->getIdentifier(),0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
+        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getPath().'/'.substr($fileData->getIdentifier(), 0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
     }
 }

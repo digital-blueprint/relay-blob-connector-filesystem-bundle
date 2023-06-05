@@ -6,11 +6,8 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Entity;
 
 date_default_timezone_set('UTC');
 
-use Doctrine\ORM\Mapping as ORM;
-
 class ShareLinkPersistence
 {
-
     private $identifier;
 
     /**

@@ -18,8 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
-use Safe\DateTimeImmutable;
-use Symfony\Component\Validator\Constraints\Date;
 
 class FilesystemServiceTest extends WebTestCase
 {
@@ -83,7 +81,7 @@ class FilesystemServiceTest extends WebTestCase
         $bucket->setPath('testfile');
         $bucket->setLinkExpireTime('P1D');
         $bucket->setMaxRetentionDuration('P1Y');
-        $bucket->setPublicKey("v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir");
+        $bucket->setPublicKey('v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir');
         $fileDataId = (string) Uuid::v4();
         $fileData = new FileData();
         $fileData->setIdentifier($fileDataId);
@@ -94,7 +92,6 @@ class FilesystemServiceTest extends WebTestCase
         $now = new \DateTimeImmutable('now');
 
         $fileData->setExistsUntil($now->add(new \DateInterval($bucket->getMaxRetentionDuration())));
-
 
         $fileDataSaved = $this->fileSystemService->saveFile($fileData);
 

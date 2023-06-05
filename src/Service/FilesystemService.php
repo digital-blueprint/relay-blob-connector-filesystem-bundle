@@ -6,16 +6,13 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use DateTimeZone;
 use Dbp\Relay\BlobBundle\Entity\FileData;
+use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
-use Safe\DateTimeImmutable;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Uid\Uuid;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -81,7 +78,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // set the expire time
         $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
         $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
-        
+
         $payload = [
             'cs' => $this->generateChecksumFromFileData($fileData, $now->format('c')),
         ];
@@ -104,8 +101,15 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return true;
     }
 
-    public function generateChecksumFromFileData($fileData, $validUntil): ?string
+    public function generateChecksumFromFileData($fileData, $validUntil = ''): ?string
     {
+        // if no validUntil is given, use bucket link expiry time per default
+        if ($validUntil === '') {
+            $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
+            $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
+            $validUntil = $now->format('c');
+        }
+
         // create url to hash
         $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$validUntil;
 
