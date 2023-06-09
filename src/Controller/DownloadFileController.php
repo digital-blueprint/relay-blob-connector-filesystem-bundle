@@ -47,7 +47,13 @@ class DownloadFileController extends AbstractController
         $this->blobService->setBucket($fileData);
         $validUntil = new \DateTimeImmutable(str_replace(' ', '+', $request->query->get('validUntil', '')));
 
-        DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getPublicKey(), $request->query->get('sig', ''), $request);
+        /** @var string */
+        $sig = $request->query->get('sig', '');
+        assert(!is_null($sig));
+        assert(is_string($sig));
+        assert(!empty($sig));
+
+        DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getPublicKey(), $sig, $request);
 
         // check if file is expired or got deleted
         if ($now > $validUntil) {
