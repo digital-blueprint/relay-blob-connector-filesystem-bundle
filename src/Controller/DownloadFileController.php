@@ -58,6 +58,8 @@ class DownloadFileController extends AbstractController
         // check if file is expired or got deleted
         if ($now > $validUntil) {
             dump('link expired!');
+            dump($now);
+            dump($validUntil);
 
             return $this->fileNotFoundResponse();
         }
@@ -107,11 +109,6 @@ class DownloadFileController extends AbstractController
         $response->setContent($content);
 
         return $response;
-    }
-
-    public function generateChecksumFromRequest($request, $secret): string
-    {
-        return hash_hmac('sha256', $request->getPathInfo().'?'.'validUntil='.str_replace(' ', '+', $request->query->get('validUntil', '')), $secret);
     }
 
     public function getPath($fileData): string
