@@ -58,8 +58,6 @@ class DownloadFileController extends AbstractController
         // check if file is expired or got deleted
         if ($now > $validUntil) {
             dump('link expired!');
-            dump($now);
-            dump($validUntil);
 
             return $this->fileNotFoundResponse();
         }
