@@ -1,3 +1,6 @@
+# v0.1.3
+* Code cleanup
+
 # v0.1.2
 * Remove database from connector
 * Change signature to signed checksum, using sha2
