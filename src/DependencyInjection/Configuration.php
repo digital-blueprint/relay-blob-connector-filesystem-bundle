@@ -25,9 +25,8 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue('blobFiles')
                     ->end()
                     ->scalarNode('link_url')
-                    ->end()
-                    ->scalarNode('link_expire_time')
                         ->isRequired()
+                        ->cannotBeEmpty()
                     ->end()
                 ->end()
             ->end();

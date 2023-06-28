@@ -113,9 +113,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // create url to hash
         $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$validUntil;
 
-        // create hmac sha256 keyed hash
-        //$cs = hash_hmac('sha256', $contentUrl, $fileData->getBucket()->getPublicKey());
-
         // create sha256 hash
         $cs = hash('sha256', $contentUrl);
 
