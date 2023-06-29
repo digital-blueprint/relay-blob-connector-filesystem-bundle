@@ -51,10 +51,6 @@ class Kernel extends BaseKernel
             'secret' => '',
         ]);
 
-        $container->extension('dbp_relay_blob_connector_filesystem', [
-            'database_url' => 'mysql://dummy:dummy@dummy',
-        ]);
-
         $container->extension('api_platform', [
             'metadata_backward_compatibility_layer' => false,
         ]);

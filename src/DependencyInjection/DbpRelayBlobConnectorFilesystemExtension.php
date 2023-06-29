@@ -18,7 +18,7 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
 
     public function loadInternal(array $mergedConfig, ContainerBuilder $container)
     {
-        $this->addResourceClassDirectory($container, __DIR__.'/../Entity');
+        //$this->addResourceClassDirectory($container, __DIR__.'/../Entity');
 
         $loader = new YamlFileLoader(
             $container,
@@ -45,7 +45,7 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
                 throw new \Exception("'".$this->getAlias()."' requires the '$extKey' bundle to be loaded!");
             }
         }
-
+        /*
         $container->prependExtensionConfig('doctrine', [
             'dbal' => [
                 'connections' => [
@@ -56,7 +56,7 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
             ],
             'orm' => [
                 'entity_managers' => [
-                    'dbp_relay_blob_connector_filesystem_bundle' => [
+                    'dbp_relay_blob_connector_filesystem' => [
                         'naming_strategy' => 'doctrine.orm.naming_strategy.underscore_number_aware',
                         'connection' => 'dbp_relay_blob_connector_filesystem_bundle',
                         'mappings' => [
@@ -71,12 +71,13 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
             ],
         ]);
 
-        $this->registerEntityManager($container, 'dbp_relay_blob_connector_filesystem_bundle');
+        $this->registerEntityManager($container, 'dbp_relay_blob_connector_filesystem');
 
         $container->prependExtensionConfig('doctrine_migrations', [
             'migrations_paths' => [
                 'Dbp\Relay\BlobConnectorFilesystemBundle\Migrations' => __DIR__.'/../Migrations',
             ],
         ]);
+        */
     }
 }

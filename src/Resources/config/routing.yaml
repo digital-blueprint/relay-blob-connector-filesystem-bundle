@@ -1,5 +1,3 @@
-dbp_relay_blob_connector_filesystem_bundle:
+blob_filesystem_connector_file_download:
   path: /blob/filesystem/{identifier}
-  methods: ['GET']
-  defaults:
-    _controller: Dbp\Relay\BlobConnectorFilesystemBundle\Controller\DownloadFileController::index
+  controller: Dbp\Relay\BlobConnectorFilesystemBundle\Controller\DownloadFileController

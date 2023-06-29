@@ -35,7 +35,10 @@ class DownloadFileController extends AbstractController
         $this->configurationService = $configurationService;
     }
 
-    public function index(Request $request, string $identifier): Response
+    /**
+     * @Route("/blob/filesystem/{identifier}", name="blob_filesystem_connector_file_download")
+     */
+    public function __invoke(Request $request, string $identifier): Response
     {
         if (!$identifier) {
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No identifier set', 'blobConnectorFilesystem:no-identifier-set');
