@@ -1,4 +1,6 @@
 # v0.1.3
+* Remove last traces of the legacy database
+* Handle blob/filesystem/{id} route cleaner
 * Code cleanup
 
 # v0.1.2
