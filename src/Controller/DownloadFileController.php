@@ -56,7 +56,7 @@ class DownloadFileController extends AbstractController
         assert(is_string($sig));
         assert(!empty($sig));
 
-        DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getPublicKey(), $sig, $request);
+        DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getKey(), $sig, $request);
 
         // check if file is expired or got deleted
         if ($now > $validUntil) {
@@ -114,6 +114,6 @@ class DownloadFileController extends AbstractController
 
     public function getPath($fileData): string
     {
-        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getPath().'/'.substr($fileData->getIdentifier(), 0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
+        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), 0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
     }
 }

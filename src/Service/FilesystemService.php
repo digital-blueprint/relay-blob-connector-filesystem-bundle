@@ -54,7 +54,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         ];
 
         // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getPublicKey(), $payload));
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($contentUrl);
 
         //move file to correct destination
@@ -84,7 +84,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         ];
 
         // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getPublicKey(), $payload));
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
@@ -129,10 +129,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         if (substr($destination, -1) !== '/') {
             $destination .= '/';
         }
-        $destination .= $fileData->getBucket()->getPath();
-        if (substr($destination, -1) !== '/') {
-            $destination .= '/';
-        }
+
         $destination .= $folder;
 
         return ['destination' => $destination, 'filename' => $newFilename];
