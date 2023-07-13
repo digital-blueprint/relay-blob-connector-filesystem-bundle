@@ -78,10 +78,9 @@ class FilesystemServiceTest extends WebTestCase
     public function testSaveGetRemoveFile()
     {
         $bucket = new Bucket();
-        $bucket->setPath('testfile');
         $bucket->setLinkExpireTime('P1D');
         $bucket->setMaxRetentionDuration('P1Y');
-        $bucket->setPublicKey('v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir');
+        $bucket->setKey('v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir');
         $fileDataId = (string) Uuid::v4();
         $fileData = new FileData();
         $fileData->setIdentifier($fileDataId);
