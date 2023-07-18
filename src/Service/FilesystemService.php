@@ -12,6 +12,7 @@ use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FilesystemService implements DatasystemProviderServiceInterface
@@ -88,6 +89,42 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getBinaryData(FileData $fileData, PoliciesStruct $policiesStruct): FileData
+    {
+        // Check if sharelink is already invalid
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        /** @var string */
+        $filePath = $this->getPath($fileData);
+
+        // build binary response
+        $file = file_get_contents($filePath);
+        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+
+        // Set the mimetype with the guesser or manually
+        if ($mimeTypeGuesser->isGuesserSupported()) {
+            // Guess the mimetype of the file according to the extension of the file
+            $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
+        } else {
+            // Set the mimetype of the file manually, in this case for a text file is text/plain
+            $mimeType = 'text/plain';
+        }
+
+        $filename = $fileData->getFileName();
+
+        $fileData->setContentUrl('data:'.$mimeType.';base64,'.base64_encode($file));
+
+        return $fileData;
+    }
+
+    private function getPath($fileData): string
+    {
+        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), 0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
     }
 
     public function removeFile(FileData $fileData): bool
