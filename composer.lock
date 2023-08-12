@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "api-platform/core",
-            "version": "v2.7.14",
+            "version": "v2.7.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/api-platform/core.git",
-                "reference": "05e05bc47fc95bba01c018a4d56db73013e01a81"
+                "reference": "dd433f76da60819cd01278b54e4fb70283302aa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/api-platform/core/zipball/05e05bc47fc95bba01c018a4d56db73013e01a81",
-                "reference": "05e05bc47fc95bba01c018a4d56db73013e01a81",
+                "url": "https://api.github.com/repos/api-platform/core/zipball/dd433f76da60819cd01278b54e4fb70283302aa8",
+                "reference": "dd433f76da60819cd01278b54e4fb70283302aa8",
                 "shasum": ""
             },
             "require": {
@@ -165,7 +165,7 @@
             ],
             "support": {
                 "issues": "https://github.com/api-platform/core/issues",
-                "source": "https://github.com/api-platform/core/tree/v2.7.14"
+                "source": "https://github.com/api-platform/core/tree/v2.7.15"
             },
             "funding": [
                 {
@@ -173,7 +173,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-03T16:30:12+00:00"
+            "time": "2023-08-11T14:04:22+00:00"
         },
         {
             "name": "brick/math",
@@ -237,22 +237,22 @@
         },
         {
             "name": "dbp/relay-blob-bundle",
-            "version": "v0.1.12",
+            "version": "v0.1.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-bundle.git",
-                "reference": "33389fae3925dbf6f35e288881e796d1d822272d"
+                "reference": "cd5c4944f4caf5adf9465c73eadce223ec9068a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/33389fae3925dbf6f35e288881e796d1d822272d",
-                "reference": "33389fae3925dbf6f35e288881e796d1d822272d",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/cd5c4944f4caf5adf9465c73eadce223ec9068a0",
+                "reference": "cd5c4944f4caf5adf9465c73eadce223ec9068a0",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.7.11",
                 "dbp/relay-blob-library": "^0.1.3",
-                "dbp/relay-core-bundle": "^0.1.98",
+                "dbp/relay-core-bundle": "^0.1.118",
                 "doctrine/dbal": "^3.3",
                 "ext-json": "*",
                 "fgrosse/phpasn1": "^2.0",
@@ -316,23 +316,23 @@
             ],
             "description": "A bundle for fileserving, persisting and managing",
             "support": {
-                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.12",
+                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.13",
                 "issues": "https://github.com/digital-blueprint/relay-blob-bundle/issues"
             },
-            "time": "2023-07-28T12:44:06+00:00"
+            "time": "2023-08-08T08:19:16+00:00"
         },
         {
             "name": "dbp/relay-blob-library",
-            "version": "v0.1.4",
+            "version": "v0.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-library.git",
-                "reference": "1c0afa4dbb47c04c94fbedf42feea63172d60825"
+                "reference": "388da1aff3da35a1a5d2585d812848964a75295a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-library/zipball/1c0afa4dbb47c04c94fbedf42feea63172d60825",
-                "reference": "1c0afa4dbb47c04c94fbedf42feea63172d60825",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-library/zipball/388da1aff3da35a1a5d2585d812848964a75295a",
+                "reference": "388da1aff3da35a1a5d2585d812848964a75295a",
                 "shasum": ""
             },
             "require": {
@@ -373,22 +373,22 @@
             "description": "PHP helper library for interaction with the relay-blob-bundle.",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-blob-library/issues",
-                "source": "https://github.com/digital-blueprint/relay-blob-library/tree/v0.1.4"
+                "source": "https://github.com/digital-blueprint/relay-blob-library/tree/v0.1.6"
             },
-            "time": "2023-07-28T12:12:30+00:00"
+            "time": "2023-08-11T08:08:12+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.118",
+            "version": "v0.1.122",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "8a0ab1e88dfdd50b20a8be9e8e37dd2280566fcd"
+                "reference": "3f6eb70336e2dd69dbb5f6cab0aefdebd67c1cf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/8a0ab1e88dfdd50b20a8be9e8e37dd2280566fcd",
-                "reference": "8a0ab1e88dfdd50b20a8be9e8e37dd2280566fcd",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/3f6eb70336e2dd69dbb5f6cab0aefdebd67c1cf8",
+                "reference": "3f6eb70336e2dd69dbb5f6cab0aefdebd67c1cf8",
                 "shasum": ""
             },
             "require": {
@@ -456,9 +456,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.118"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.122"
             },
-            "time": "2023-07-27T11:57:08+00:00"
+            "time": "2023-08-09T12:12:55+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -1831,16 +1831,16 @@
         },
         {
             "name": "dragonmantank/cron-expression",
-            "version": "v3.3.2",
+            "version": "v3.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dragonmantank/cron-expression.git",
-                "reference": "782ca5968ab8b954773518e9e49a6f892a34b2a8"
+                "reference": "adfb1f505deb6384dc8b39804c5065dd3c8c8c0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/782ca5968ab8b954773518e9e49a6f892a34b2a8",
-                "reference": "782ca5968ab8b954773518e9e49a6f892a34b2a8",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/adfb1f505deb6384dc8b39804c5065dd3c8c8c0a",
+                "reference": "adfb1f505deb6384dc8b39804c5065dd3c8c8c0a",
                 "shasum": ""
             },
             "require": {
@@ -1880,7 +1880,7 @@
             ],
             "support": {
                 "issues": "https://github.com/dragonmantank/cron-expression/issues",
-                "source": "https://github.com/dragonmantank/cron-expression/tree/v3.3.2"
+                "source": "https://github.com/dragonmantank/cron-expression/tree/v3.3.3"
             },
             "funding": [
                 {
@@ -1888,7 +1888,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-09-10T18:51:20+00:00"
+            "time": "2023-08-10T19:36:49+00:00"
         },
         {
             "name": "egulias/email-validator",
