@@ -91,10 +91,19 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
+    public function getBinaryResponse(FileData $fileData, PoliciesStruct $policiesStruct): Response
+    {
+        $response = new Response();
+
+        // TODO: Implement getBinaryResponse() method.
+
+        return $response;
+    }
+
     /**
      * @throws \Exception
      */
-    public function getBinaryData(FileData $fileData, PoliciesStruct $policiesStruct): FileData
+    public function getBase64Data(FileData $fileData, PoliciesStruct $policiesStruct): FileData
     {
         // Check if sharelink is already invalid
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
