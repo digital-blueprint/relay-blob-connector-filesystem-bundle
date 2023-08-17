@@ -1,7 +1,5 @@
-Relay-Blob-Connector-Filesystem Bundle README
+Relay-Blob-Connector-Filesystem Bundle
 ================================
-
-# DbpRelayBlobConnectorFilesystemBundle
 
 [GitHub](https://github.com/digital-blueprint/relay-blob-connector-filesystem-bundle)
 
