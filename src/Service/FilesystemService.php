@@ -99,7 +99,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         // Check if sharelink is already invalid
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
-        /** @var string $fileData */
+        /** @var string */
         $filePath = $this->getPath($fileData);
 
         // build binary response
