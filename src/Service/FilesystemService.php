@@ -45,7 +45,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         // the file link should expire in the near future
-        // set the expire time
+        // set the expiry time
         $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
         $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
 
@@ -76,7 +76,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     public function getLink(FileData $fileData, PoliciesStruct $policiesStruct): ?FileData
     {
         // the file link should expire in the near future
-        // set the expire time
+        // set the expiry time
         $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
         $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
 
