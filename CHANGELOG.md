@@ -1,3 +1,7 @@
+# v0.1.6
+* Rename `getBinaryData` to `getBase64Data` in FilesystemService
+* Implement `getBinaryResponse` in FilesystemService that responds with binary data
+
 # v0.1.4
 * Removal of `path` and rename of `public_key` to `key` in blob config
 
