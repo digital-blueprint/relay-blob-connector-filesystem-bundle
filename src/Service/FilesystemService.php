@@ -11,7 +11,9 @@ use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -91,15 +93,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
-    public function getBinaryResponse(FileData $fileData, PoliciesStruct $policiesStruct): Response
-    {
-        $response = new Response();
-
-        // TODO: Implement getBinaryResponse() method.
-
-        return $response;
-    }
-
     /**
      * @throws \Exception
      */
@@ -129,6 +122,36 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $fileData->setContentUrl('data:'.$mimeType.';base64,'.base64_encode($file));
 
         return $fileData;
+    }
+
+    public function getBinaryResponse(FileData $fileData, PoliciesStruct $policiesStruct): Response
+    {
+        // Check if sharelink is already invalid
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        /** @var string */
+        $filePath = $this->getPath($fileData);
+
+        $response = new BinaryFileResponse($filePath);
+        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+
+        // Set the mimetype with the guesser or manually
+        if ($mimeTypeGuesser->isGuesserSupported()) {
+            // Guess the mimetype of the file according to the extension of the file
+            $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
+        } else {
+            // Set the mimetype of the file manually, in this case for a text file is text/plain
+            $response->headers->set('Content-Type', 'text/plain');
+        }
+
+        $filename = $fileData->getFileName();
+
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $filename
+        );
+
+        return $response;
     }
 
     private function getPath($fileData): string
