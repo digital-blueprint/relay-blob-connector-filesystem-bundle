@@ -323,16 +323,16 @@
         },
         {
             "name": "dbp/relay-blob-library",
-            "version": "v0.1.6",
+            "version": "v0.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-library.git",
-                "reference": "388da1aff3da35a1a5d2585d812848964a75295a"
+                "reference": "506397035f56d32d9a169c6f4ef90f8d0c1a6f48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-library/zipball/388da1aff3da35a1a5d2585d812848964a75295a",
-                "reference": "388da1aff3da35a1a5d2585d812848964a75295a",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-library/zipball/506397035f56d32d9a169c6f4ef90f8d0c1a6f48",
+                "reference": "506397035f56d32d9a169c6f4ef90f8d0c1a6f48",
                 "shasum": ""
             },
             "require": {
@@ -373,9 +373,9 @@
             "description": "PHP helper library for interaction with the relay-blob-bundle.",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-blob-library/issues",
-                "source": "https://github.com/digital-blueprint/relay-blob-library/tree/v0.1.6"
+                "source": "https://github.com/digital-blueprint/relay-blob-library/tree/v0.1.7"
             },
-            "time": "2023-08-11T08:08:12+00:00"
+            "time": "2023-08-21T10:47:23+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
@@ -5665,19 +5665,20 @@
         },
         {
             "name": "symfony/orm-pack",
-            "version": "v2.3.0",
+            "version": "v2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/orm-pack.git",
-                "reference": "498e2f554a1a0ac0a776cd348c9150a186383075"
+                "reference": "13b7bcec955f163e3cbf6b24773b9ad3127213e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/orm-pack/zipball/498e2f554a1a0ac0a776cd348c9150a186383075",
-                "reference": "498e2f554a1a0ac0a776cd348c9150a186383075",
+                "url": "https://api.github.com/repos/symfony/orm-pack/zipball/13b7bcec955f163e3cbf6b24773b9ad3127213e2",
+                "reference": "13b7bcec955f163e3cbf6b24773b9ad3127213e2",
                 "shasum": ""
             },
             "require": {
+                "doctrine/annotations": "*",
                 "doctrine/doctrine-bundle": "*",
                 "doctrine/doctrine-migrations-bundle": "*",
                 "doctrine/orm": "*"
@@ -5690,7 +5691,7 @@
             "description": "A pack for the Doctrine ORM",
             "support": {
                 "issues": "https://github.com/symfony/orm-pack/issues",
-                "source": "https://github.com/symfony/orm-pack/tree/v2.3.0"
+                "source": "https://github.com/symfony/orm-pack/tree/v2.3.1"
             },
             "funding": [
                 {
@@ -5706,7 +5707,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-05T14:15:35+00:00"
+            "time": "2023-08-21T09:10:49+00:00"
         },
         {
             "name": "symfony/password-hasher",
@@ -10096,16 +10097,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.28",
+            "version": "1.10.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "e4545b55904ebef470423d3ddddb74fa7325497a"
+                "reference": "ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e4545b55904ebef470423d3ddddb74fa7325497a",
-                "reference": "e4545b55904ebef470423d3ddddb74fa7325497a",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1",
+                "reference": "ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1",
                 "shasum": ""
             },
             "require": {
@@ -10154,7 +10155,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-08T12:33:42+00:00"
+            "time": "2023-08-14T13:24:11+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
@@ -10600,16 +10601,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.6.10",
+            "version": "9.6.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "a6d351645c3fe5a30f5e86be6577d946af65a328"
+                "reference": "810500e92855eba8a7a5319ae913be2da6f957b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a6d351645c3fe5a30f5e86be6577d946af65a328",
-                "reference": "a6d351645c3fe5a30f5e86be6577d946af65a328",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/810500e92855eba8a7a5319ae913be2da6f957b0",
+                "reference": "810500e92855eba8a7a5319ae913be2da6f957b0",
                 "shasum": ""
             },
             "require": {
@@ -10683,7 +10684,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.10"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.11"
             },
             "funding": [
                 {
@@ -10699,7 +10700,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-10T04:04:23+00:00"
+            "time": "2023-08-19T07:10:56+00:00"
         },
         {
             "name": "sebastian/cli-parser",
