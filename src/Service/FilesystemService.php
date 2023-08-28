@@ -73,6 +73,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
     }
 
     /**
+     * Get HTTP link to binary content
+     *
+     * @param FileData $fileData fileData for which a link should be provided
+     * @param PoliciesStruct $policiesStruct policies
+     *
      * @throws \Exception
      */
     public function getLink(FileData $fileData, PoliciesStruct $policiesStruct): ?FileData
