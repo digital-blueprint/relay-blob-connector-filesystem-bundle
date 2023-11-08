@@ -114,6 +114,6 @@ class DownloadFileController extends AbstractController
 
     public function getPath($fileData): string
     {
-        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), 0, 2).'/'.$fileData->getIdentifier().'.'.$fileData->getExtension();
+        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), 0, 2).'/'.$fileData->getIdentifier();
     }
 }
