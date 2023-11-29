@@ -237,16 +237,16 @@
         },
         {
             "name": "dbp/relay-blob-bundle",
-            "version": "v0.1.17",
+            "version": "v0.1.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-bundle.git",
-                "reference": "92537e15ad509fd69ee15d356c00e953808ee675"
+                "reference": "45ef4f24b5cdc5e2419437092b627e8c87bd80cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/92537e15ad509fd69ee15d356c00e953808ee675",
-                "reference": "92537e15ad509fd69ee15d356c00e953808ee675",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/45ef4f24b5cdc5e2419437092b627e8c87bd80cf",
+                "reference": "45ef4f24b5cdc5e2419437092b627e8c87bd80cf",
                 "shasum": ""
             },
             "require": {
@@ -256,6 +256,7 @@
                 "doctrine/dbal": "^3.3",
                 "ext-json": "*",
                 "fgrosse/phpasn1": "^2.0",
+                "justinrainbow/json-schema": "^5.2",
                 "php": ">=7.3",
                 "symfony/event-dispatcher": "^5.4",
                 "symfony/mailer": "^5.4",
@@ -316,10 +317,10 @@
             ],
             "description": "A bundle for fileserving, persisting and managing",
             "support": {
-                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.17",
+                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.18",
                 "issues": "https://github.com/digital-blueprint/relay-blob-bundle/issues"
             },
-            "time": "2023-10-17T12:00:52+00:00"
+            "time": "2023-11-28T12:44:57+00:00"
         },
         {
             "name": "dbp/relay-blob-library",
@@ -2451,6 +2452,76 @@
                 }
             ],
             "time": "2023-08-27T10:13:57+00:00"
+        },
+        {
+            "name": "justinrainbow/json-schema",
+            "version": "v5.2.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/justinrainbow/json-schema.git",
+                "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/fbbe7e5d79f618997bc3332a6f49246036c45793",
+                "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~2.2.20||~2.15.1",
+                "json-schema/json-schema-test-suite": "1.2.0",
+                "phpunit/phpunit": "^4.8.35"
+            },
+            "bin": [
+                "bin/validate-json"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JsonSchema\\": "src/JsonSchema/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Prieto Reis",
+                    "email": "bruno.p.reis@gmail.com"
+                },
+                {
+                    "name": "Justin Rainbow",
+                    "email": "justin.rainbow@gmail.com"
+                },
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch"
+                },
+                {
+                    "name": "Robert Schönthal",
+                    "email": "seroscho@googlemail.com"
+                }
+            ],
+            "description": "A library to validate a json schema.",
+            "homepage": "https://github.com/justinrainbow/json-schema",
+            "keywords": [
+                "json",
+                "schema"
+            ],
+            "support": {
+                "issues": "https://github.com/justinrainbow/json-schema/issues",
+                "source": "https://github.com/justinrainbow/json-schema/tree/v5.2.13"
+            },
+            "time": "2023-09-26T02:20:38+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -12376,5 +12447,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
