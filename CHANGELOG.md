@@ -1,3 +1,6 @@
+# v0.1.7
+* Remove `getExtension` since it is no longer supported by blob
+
 # v0.1.6
 * Rename `getBinaryData` to `getBase64Data` in FilesystemService
 * Implement `getBinaryResponse` in FilesystemService that responds with binary data
