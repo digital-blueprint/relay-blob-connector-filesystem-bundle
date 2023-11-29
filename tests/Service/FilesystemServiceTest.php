@@ -85,7 +85,6 @@ class FilesystemServiceTest extends WebTestCase
         $fileData = new FileData();
         $fileData->setIdentifier($fileDataId);
         $fileData->setFile($this->getExampleFile());
-        $fileData->setExtension('pdf');
         $fileData->setBucket($bucket);
 
         $now = new \DateTimeImmutable('now');
