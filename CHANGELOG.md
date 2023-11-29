@@ -1,3 +1,7 @@
+# v0.1.8
+* Update to blob v0.1.18
+* Remove `setExtension` and fix test issues caused by new blob version
+
 # v0.1.7
 * Remove `getExtension` since it is no longer supported by blob
 
