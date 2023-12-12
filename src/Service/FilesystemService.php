@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -99,7 +99,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
-    public function getFilePath(FileData $fileData) : string
+    public function getFilePath(FileData $fileData): string
     {
         $filePath = $this->getPath($fileData);
 
@@ -108,7 +108,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         if (!file_exists($filePath)) {
             $mimeTypeToExt = new MimeTypes();
             $types = $mimeTypeToExt->getExtensions($fileData->getMimeType());
-            foreach($types as $ext) {
+            foreach ($types as $ext) {
                 $newPath = $filePath.'.'.$ext;
                 if (file_exists($newPath)) {
                     $filePath = $newPath;
@@ -136,20 +136,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
             if ($mimeTypeGuesser->isGuesserSupported()) {
                 // Guess the mimetype of the file according to the extension of the file
                 $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
-            } else if ($fileData->getMimeType()) {
+            } elseif ($fileData->getMimeType()) {
                 // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
                 $mimeType = $fileData->getMimeType();
-            }
-            else {
+            } else {
                 // Set the mimetype of the file manually, in this case for a text file is text/plain
                 $mimeType = 'text/plain';
             }
 
             $filename = $fileData->getFileName();
 
-            $fileData->setContentUrl('data:' . $mimeType . ';base64,' . base64_encode($file));
-        }
-        catch (\Exception $e) {
+            $fileData->setContentUrl('data:'.$mimeType.';base64,'.base64_encode($file));
+        } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
         }
 
@@ -162,7 +160,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $filePath = $this->getFilePath($fileData);
 
         try {
-
             $response = new BinaryFileResponse($filePath);
             $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
@@ -170,11 +167,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
             if ($mimeTypeGuesser->isGuesserSupported()) {
                 // Guess the mimetype of the file according to the extension of the file
                 $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
-            } else if ($fileData->getMimeType()) {
+            } elseif ($fileData->getMimeType()) {
                 // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
                 $response->headers->set('Content-Type', $fileData->getMimeType());
-            }
-            else {
+            } else {
                 // Set the mimetype of the file manually, in this case for a text file is text/plain
                 $response->headers->set('Content-Type', 'text/plain');
             }
@@ -185,11 +181,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 ResponseHeaderBag::DISPOSITION_ATTACHMENT,
                 $filename
             );
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
         }
-
 
         return $response;
     }
@@ -223,9 +217,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$validUntil;
 
         // create sha256 hash
-        $cs = hash('sha256', $contentUrl);
-
-        return $cs;
+        return hash('sha256', $contentUrl);
     }
 
     private function generatePath(FileData $fileData): array
