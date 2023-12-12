@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Mime\MimeTypes;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -98,63 +99,97 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
+    public function getFilePath(FileData $fileData) : string
+    {
+        $filePath = $this->getPath($fileData);
+
+        // if file doesnt exist, then the same file with extension should exist
+        // file extensions were removed in version v0.1.7
+        if (!file_exists($filePath)) {
+            $mimeTypeToExt = new MimeTypes();
+            $types = $mimeTypeToExt->getExtensions($fileData->getMimeType());
+            foreach($types as $ext) {
+                $newPath = $filePath.'.'.$ext;
+                if (file_exists($newPath)) {
+                    $filePath = $newPath;
+                }
+            }
+        }
+
+        return $filePath;
+    }
+
     /**
      * @throws \Exception
      */
     public function getBase64Data(FileData $fileData, PoliciesStruct $policiesStruct): FileData
     {
-        // Check if sharelink is already invalid
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        /** @var string $filePath */
+        $filePath = $this->getFilePath($fileData);
 
-        /** @var string */
-        $filePath = $this->getPath($fileData);
+        try {
+            // build binary response
+            $file = file_get_contents($filePath);
+            $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
-        // build binary response
-        $file = file_get_contents($filePath);
-        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+            // Set the mimetype with the guesser or manually
+            if ($mimeTypeGuesser->isGuesserSupported()) {
+                // Guess the mimetype of the file according to the extension of the file
+                $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
+            } else if ($fileData->getMimeType()) {
+                // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
+                $mimeType = $fileData->getMimeType();
+            }
+            else {
+                // Set the mimetype of the file manually, in this case for a text file is text/plain
+                $mimeType = 'text/plain';
+            }
 
-        // Set the mimetype with the guesser or manually
-        if ($mimeTypeGuesser->isGuesserSupported()) {
-            // Guess the mimetype of the file according to the extension of the file
-            $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
-        } else {
-            // Set the mimetype of the file manually, in this case for a text file is text/plain
-            $mimeType = 'text/plain';
+            $filename = $fileData->getFileName();
+
+            $fileData->setContentUrl('data:' . $mimeType . ';base64,' . base64_encode($file));
         }
-
-        $filename = $fileData->getFileName();
-
-        $fileData->setContentUrl('data:'.$mimeType.';base64,'.base64_encode($file));
+        catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
+        }
 
         return $fileData;
     }
 
     public function getBinaryResponse(FileData $fileData, PoliciesStruct $policiesStruct): Response
     {
-        // Check if sharelink is already invalid
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        /** @var string $filePath */
+        $filePath = $this->getFilePath($fileData);
 
-        /** @var string */
-        $filePath = $this->getPath($fileData);
+        try {
 
-        $response = new BinaryFileResponse($filePath);
-        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+            $response = new BinaryFileResponse($filePath);
+            $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
-        // Set the mimetype with the guesser or manually
-        if ($mimeTypeGuesser->isGuesserSupported()) {
-            // Guess the mimetype of the file according to the extension of the file
-            $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
-        } else {
-            // Set the mimetype of the file manually, in this case for a text file is text/plain
-            $response->headers->set('Content-Type', 'text/plain');
+            // Set the mimetype with the guesser or manually
+            if ($mimeTypeGuesser->isGuesserSupported()) {
+                // Guess the mimetype of the file according to the extension of the file
+                $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
+            } else if ($fileData->getMimeType()) {
+                // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
+                $response->headers->set('Content-Type', $fileData->getMimeType());
+            }
+            else {
+                // Set the mimetype of the file manually, in this case for a text file is text/plain
+                $response->headers->set('Content-Type', 'text/plain');
+            }
+
+            $filename = $fileData->getFileName();
+
+            $response->setContentDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $filename
+            );
+        }
+        catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
         }
 
-        $filename = $fileData->getFileName();
-
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filename
-        );
 
         return $response;
     }
