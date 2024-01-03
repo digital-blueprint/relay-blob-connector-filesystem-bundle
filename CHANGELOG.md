@@ -1,3 +1,7 @@
+# v0.1.10
+* Add additional checks on data retrieval
+* Introduce new error cases on filedata retrieval
+
 # v0.1.9
 * Fix bug that made older files retrievable (bug occurred since v0.1.7)
 
