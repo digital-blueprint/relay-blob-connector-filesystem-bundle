@@ -58,7 +58,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         ];
 
         // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), urlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($contentUrl);
 
         //move file to correct destination
@@ -89,11 +89,11 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
 
         $payload = [
-            'cs' => $this->generateChecksumFromFileData($fileData, $now->format('c')),
+            'ucs' => $this->generateChecksumFromFileData($fileData, $now->format('c')),
         ];
 
         // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), $now->format('c'), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), urlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
@@ -143,8 +143,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 // Set the mimetype of the file manually, in this case for a text file is text/plain
                 $mimeType = 'text/plain';
             }
-
-            $filename = $fileData->getFileName();
 
             $fileData->setContentUrl('data:'.$mimeType.';base64,'.base64_encode($file));
         } catch (\Exception $e) {

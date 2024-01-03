@@ -44,19 +44,45 @@ class DownloadFileController extends AbstractController
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'No identifier set', 'blobConnectorFilesystem:no-identifier-set');
         }
 
-        // Check if sharelink is already invalid
+        // get necessary params
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $fileData = $this->blobService->getFileData($identifier);
         $this->blobService->setBucket($fileData);
-        $validUntil = new \DateTimeImmutable(str_replace(' ', '+', $request->query->get('validUntil', '')));
+
+        /** @var string */
+        $validUntil = $request->query->get('validUntil', '');
+        assert(is_string($validUntil));
+        $validUntil = urldecode($validUntil);
 
         /** @var string */
         $sig = $request->query->get('sig', '');
+
+        // Check link for validity
+        if (!$validUntil) {
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'validUntil missing', 'blob-connector-filesystem:missing-valid-until');
+        }
+
+        if (!$sig) {
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'signature missing', 'blob-connector-filesystem:missing-sig');
+        }
+
         assert(!is_null($sig));
         assert(is_string($sig));
         assert(!empty($sig));
 
+        assert(!is_null($validUntil));
+        assert(is_string($validUntil));
+        assert(!empty($validUntil));
+
+        // check signature
         DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getKey(), $sig, $request);
+
+        // check if validUntil is a valid datetime
+        try {
+            $validUntil = new \DateTimeImmutable($validUntil);
+        } catch (\Exception $e) {
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'validUntil date format malformed', 'blob-connector-filesystem:malformed-valid-until');
+        }
 
         // check if file is expired or got deleted
         if ($now > $validUntil) {
@@ -108,6 +134,7 @@ class DownloadFileController extends AbstractController
 
         $response = new Response();
         $response->setContent($content);
+        $response->setStatusCode(400);
 
         return $response;
     }
