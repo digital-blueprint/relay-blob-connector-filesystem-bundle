@@ -68,11 +68,9 @@ class DownloadFileController extends AbstractController
 
         assert(!is_null($sig));
         assert(is_string($sig));
-        assert(!empty($sig));
 
         assert(!is_null($validUntil));
         assert(is_string($validUntil));
-        assert(!empty($validUntil));
 
         // check signature
         DenyAccessUnlessCheckSignature::verifyChecksumAndSignature($fileData->getBucket()->getKey(), $sig, $request);
