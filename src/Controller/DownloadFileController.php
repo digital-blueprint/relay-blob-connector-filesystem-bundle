@@ -52,7 +52,7 @@ class DownloadFileController extends AbstractController
         /** @var string */
         $validUntil = $request->query->get('validUntil', '');
         assert(is_string($validUntil));
-        $validUntil = urldecode($validUntil);
+        $validUntil = rawurldecode($validUntil);
 
         /** @var string */
         $sig = $request->query->get('sig', '');

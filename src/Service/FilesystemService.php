@@ -58,7 +58,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         ];
 
         // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), urlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($contentUrl);
 
         //move file to correct destination
@@ -93,7 +93,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         ];
 
         // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), urlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
+        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
@@ -212,7 +212,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         // create url to hash
-        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.$validUntil;
+        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.rawurlencode($validUntil);
 
         // create sha256 hash
         return hash('sha256', $contentUrl);
