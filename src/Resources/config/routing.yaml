@@ -1,3 +1,0 @@
-blob_filesystem_connector_file_download:
-  path: /blob/filesystem/{identifier}
-  controller: Dbp\Relay\BlobConnectorFilesystemBundle\Controller\DownloadFileController
