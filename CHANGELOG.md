@@ -1,3 +1,6 @@
+# v0.1.11
+* Remove connector endpoint since its not necessary anymore
+
 # v0.1.10
 * Add additional checks on data retrieval
 * Introduce new error cases on filedata retrieval
