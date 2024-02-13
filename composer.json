@@ -1,6 +1,6 @@
 {
     "name": "dbp/relay-blob-connector-filesystem-bundle",
-    "description": "A template bundle for the Relay API gateway",
+    "description": "Connector bundle for the relay-blob-bundle to store blob data on the filesystem",
     "type": "symfony-bundle",
     "license": "AGPL-3.0-or-later",
     "require": {
