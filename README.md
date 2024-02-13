@@ -1,23 +1,26 @@
 Relay-Blob-Connector-Filesystem Bundle
 ================================
 
-[GitHub](https://github.com/digital-blueprint/relay-blob-connector-filesystem-bundle)
+[GitHub](https://github.com/digital-blueprint/relay-blob-connector-filesystem-bundle) |
+[Packagist](https://packagist.org/packages/dbp/relay-blob-connector-filesystem-bundle) |
+[Changelog](https://github.com/digital-blueprint/relay-blob-connector-filesystem-bundle/blob/main/CHANGELOG.md)
 
-This bundle is a connector bundle for the dbp-relay-blob-bundle. It implements the [`DatasystemProviderServiceInterface`](https://github.com/digital-blueprint/relay-blob-bundle/blob/main/src/Service/DatasystemProviderServiceInterface.php) of the blob bundle.
-It can save files to a specific path, rename those files, remove those files, or return short-lived sharelinks.
+This bundle is a connector bundle for the [relay-blob-bundle](https://github.com/digital-blueprint/relay-blob-bundle) to store blob data on the filesystem.
+It implements the [`DatasystemProviderServiceInterface`](https://github.com/digital-blueprint/relay-blob-bundle/blob/main/src/Service/DatasystemProviderServiceInterface.php) of the blob bundle.
+It can save files to a specific path, rename those files, remove those files, or return short-lived share-links.
 
 ## Requirements
-You need a DbpRelayBlobConnector bundle installed to make this bundle working. E.g. [DbpRelayBlobBundle](https://github.com/digital-blueprint/relay-blob-bundle)
 
-<!--
+You need the DbpRelayBlob bundle installed to make this bundle working, see [DbpRelayBlobBundle](https://github.com/digital-blueprint/relay-blob-bundle).
+
 ## Bundle installation
 
-You can install the bundle directly from [packagist.org](https://packagist.org/packages/{{package-name}}).
+You can install the bundle directly from [packagist.org](https://packagist.org/packages/dbp/relay-blob-connector-filesystem-bundle).
 
 ```bash
-composer require {{package-name}}
+composer require dbp/relay-blob-connector-filesystem-bundle
 ```
--->
+
 ## Integration into the Relay API Server
 
 * Add the bundle to your `config/bundles.php` in front of `DbpRelayCoreBundle`:
@@ -100,10 +103,8 @@ Returns a binary file response of a sharelink id if the sharelink is valid and i
 | `blob-connector-filesystem:path-not-generated` | 500         | Path could not be generated      | `message`          | |
 | `blob-connector-filesystem:sharelink-not-saved` | 500         | ShareLink could not be saved!    | `message`          | |
 
-
-
 ## CronJobs
 
 ### Cleanup Cronjob
-`Blob Connector Filesystem Database cleanup`: This cronjob is for cleanup purposes. It deletes all invalid sharelinks and starts every hour.
 
+`Blob Connector Filesystem Database cleanup`: This cronjob is for cleanup purposes. It deletes all invalid sharelinks and starts every hour.
