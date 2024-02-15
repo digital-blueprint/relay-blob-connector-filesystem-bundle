@@ -48,10 +48,8 @@ content:
 
 ```yaml
 dbp_relay_blob_connector_filesystem:
-  database_url: '%env(resolve:DATABASE_URL)%'
   path: '%kernel.project_dir%/var/blobFiles' # path where files should be placed
   link_url: 'http://localhost:8000/' # base link_url of the api
-  link_expire_time: 'P7D' # default max expire time of sharelinks in ISO 8601 can be overwritten by bucket config of blob bundle
 ```
 
 For more info on bundle configuration see <https://symfony.com/doc/current/bundles/configuration.html>.
