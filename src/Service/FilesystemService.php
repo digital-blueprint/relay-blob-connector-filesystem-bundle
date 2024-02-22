@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
-use DateTimeZone;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
 use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
@@ -49,7 +48,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         // the file link should expire in the near future
         // set the expiry time
-        $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
 
         $payload = [
@@ -61,7 +60,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($contentUrl);
 
-        //move file to correct destination
+        // move file to correct destination
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
         return $fileData;
@@ -85,7 +84,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     {
         // the file link should expire in the near future
         // set the expiry time
-        $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
 
         $payload = [
@@ -206,7 +205,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     {
         // if no validUntil is given, use bucket link expiry time per default
         if ($validUntil === '') {
-            $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
+            $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
             $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
             $validUntil = $now->format('c');
         }

@@ -98,7 +98,7 @@ class FilesystemServiceTest extends WebTestCase
         $ret = $this->fileSystemService->removeFile($fileData);
         $this->assertTrue($ret);
 
-        //check dir empty
+        // check dir empty
         $this->assertNull(FileOperations::isDirEmpty('testfile'));
     }
 }

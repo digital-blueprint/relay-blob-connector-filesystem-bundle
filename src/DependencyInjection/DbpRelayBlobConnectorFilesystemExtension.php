@@ -18,7 +18,7 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
 
     public function loadInternal(array $mergedConfig, ContainerBuilder $container)
     {
-        //$this->addResourceClassDirectory($container, __DIR__.'/../Entity');
+        // $this->addResourceClassDirectory($container, __DIR__.'/../Entity');
 
         $loader = new YamlFileLoader(
             $container,
@@ -32,9 +32,6 @@ class DbpRelayBlobConnectorFilesystemExtension extends ConfigurableExtension imp
         $definition->addMethodCall('setConfig', [$mergedConfig]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepend(ContainerBuilder $container): void
     {
         $configs = $container->getExtensionConfig($this->getAlias());
