@@ -1,3 +1,6 @@
+# v0.1.12
+* Drop support for PHP 7.3
+
 # v0.1.11
 * Remove connector endpoint since its not necessary anymore
 
