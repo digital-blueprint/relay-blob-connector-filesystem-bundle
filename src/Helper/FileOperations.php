@@ -29,6 +29,15 @@ class FileOperations
         }
     }
 
+    public static function saveFileFromString(string $file, string $dest, string $name)
+    {
+        $return = file_put_contents($dest.'/'.$name, $file);
+
+        if ($return === false) {
+            throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error');
+        }
+    }
+
     public static function removeFile(string $path, string $folder)
     {
         // Remove File from server
