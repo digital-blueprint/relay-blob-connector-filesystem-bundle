@@ -225,7 +225,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private function getPath($fileData): string
     {
-        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), 24, 4).'/'.substr($fileData->getIdentifier(), 28, 4).'/'.$fileData->getIdentifier();
+        $numOfChars = 3;
+        $baseOffset = 24;
+
+        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
     }
 
     public function removeFile(FileData $fileData): bool
@@ -257,9 +260,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private function generatePath(FileData $fileData): array
     {
+        $numOfChars = 3;
+        $baseOffset = 24;
+
         $id = $fileData->getIdentifier();
-        $folder = substr($id, 24, 4);
-        $nextFolder = substr($id, 28, 4);
+        $folder = substr($id, $baseOffset, $numOfChars);
+        $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
         $safeFilename = $this->slugger->slug($id);
         $newFilename = $safeFilename.'';
         $destination = $this->configurationService->getPath();
