@@ -80,7 +80,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         // the file link should expire in the near future
         // set the expiry time
-        $now = new \DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
 
         $payload = [
@@ -92,7 +92,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
         $fileData->setContentUrl($contentUrl);
 
-        //move file to correct destination
+        // move file to correct destination
         FileOperations::saveFileFromString($data, $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
 
         try {
