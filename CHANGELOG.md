@@ -1,3 +1,7 @@
+# v0.1.14
+* **BREAKING**: Add a 2nd layer to the directory hierarchy of blob files. Now, the files get stored in a folder with 3 characters, which is stored in another folder with 3 characters.
+* Add function that enables upload of base64 encoded strings as files
+
 # v0.1.13
 * Drop support for PHP 7.4/8.0
 
