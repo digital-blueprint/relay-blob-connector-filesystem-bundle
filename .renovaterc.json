@@ -21,8 +21,8 @@
       "allowedVersions": "<3"
     },
     {
-      "matchPackageNames": ["friendsofphp/php-cs-fixer"],
-      "allowedVersions": "<3.5"
+      "matchPackageNames": ["phpunit/phpunit"],
+      "allowedVersions": "<10"
     }
   ]
 }
