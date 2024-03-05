@@ -223,12 +223,16 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $response;
     }
 
+    /**
+     * @param $fileData FileData
+     * @return string
+     */
     private function getPath($fileData): string
     {
         $numOfChars = 3;
         $baseOffset = 24;
 
-        return $this->configurationService->getPath().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
+        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getIdentifier().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
     }
 
     public function removeFile(FileData $fileData): bool
@@ -263,6 +267,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $numOfChars = 3;
         $baseOffset = 24;
 
+        $bucketId = $fileData->getBucket()->getIdentifier();
         $id = $fileData->getIdentifier();
         $folder = substr($id, $baseOffset, $numOfChars);
         $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
@@ -273,7 +278,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             $destination .= '/';
         }
 
-        $destination = $destination.$folder.'/'.$nextFolder;
+        $destination = $destination.$bucketId.'/'.$folder.'/'.$nextFolder;
 
         return ['destination' => $destination, 'filename' => $newFilename];
     }
