@@ -81,6 +81,7 @@ class FilesystemServiceTest extends WebTestCase
         $bucket->setLinkExpireTime('P1D');
         $bucket->setMaxRetentionDuration('P1Y');
         $bucket->setKey('v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir');
+        $bucket->setIdentifier((string) Uuid::v4());
         $fileDataId = (string) Uuid::v4();
         $fileData = new FileData();
         $fileData->setIdentifier($fileDataId);
