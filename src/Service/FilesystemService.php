@@ -225,7 +225,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     /**
      * @param $fileData FileData
-     * @return string
      */
     private function getPath($fileData): string
     {
