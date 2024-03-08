@@ -51,8 +51,17 @@ class Kernel extends BaseKernel
             'secret' => '',
         ]);
 
+        $container->extension('doctrine', [
+            'orm' => [],
+            'dbal' => [],
+        ]);
+
         $container->extension('api_platform', [
             'metadata_backward_compatibility_layer' => false,
+        ]);
+
+        $container->extension('dbp_relay_blob_connector_filesystem', [
+            'link_url' => '',
         ]);
     }
 }
