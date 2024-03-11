@@ -1,3 +1,7 @@
+# v0.1.15
+
+* composer: fix dependency on dbp/relay-blob-bundle
+
 # v0.1.14
 * **BREAKING**: Add a 2nd layer to the directory hierarchy of blob files. Now, the files get stored in a folder named after the `internal_bucket_id`. Inside there is a folder using 3 characters of the random UUID part, which is stored in another folder with 3 characters of the random UUID part.
 * Add function that enables upload of base64 encoded strings as files

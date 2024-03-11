@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b43bc4ae2acfd7057fe883f7421b0f79",
+    "content-hash": "db5e803197b002d2c5b4080bfab4e50d",
     "packages": [
         {
             "name": "api-platform/core",
@@ -232,16 +232,16 @@
         },
         {
             "name": "dbp/relay-blob-bundle",
-            "version": "dev-main",
+            "version": "v0.1.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-bundle.git",
-                "reference": "0aa85de3bc10a1d14b27adcaeff4ae24aaffb7e7"
+                "reference": "fa6092e485ea309766e956c2ed05259242970997"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/0aa85de3bc10a1d14b27adcaeff4ae24aaffb7e7",
-                "reference": "0aa85de3bc10a1d14b27adcaeff4ae24aaffb7e7",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/fa6092e485ea309766e956c2ed05259242970997",
+                "reference": "fa6092e485ea309766e956c2ed05259242970997",
                 "shasum": ""
             },
             "require": {
@@ -287,7 +287,6 @@
                 "symfony/phpunit-bridge": "^5.4 || ^6.4",
                 "vimeo/psalm": "^5.22.2"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -329,10 +328,10 @@
             ],
             "description": "A bundle for file-serving, persisting and managing",
             "support": {
-                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/main",
+                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.20",
                 "issues": "https://github.com/digital-blueprint/relay-blob-bundle/issues"
             },
-            "time": "2024-03-11T10:18:32+00:00"
+            "time": "2024-03-11T11:23:48+00:00"
         },
         {
             "name": "dbp/relay-blob-library",
@@ -12310,9 +12309,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "dbp/relay-blob-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -12325,5 +12322,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
