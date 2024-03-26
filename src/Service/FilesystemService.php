@@ -6,7 +6,6 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
-use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
@@ -114,11 +113,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
      * Get HTTP link to binary content.
      *
      * @param FileData       $fileData       fileData for which a link should be provided
-     * @param PoliciesStruct $policiesStruct policies
      *
      * @throws \Exception
      */
-    public function getLink(FileData $fileData, PoliciesStruct $policiesStruct): ?FileData
+    public function getLink(FileData $fileData): ?FileData
     {
         // the file link should expire in the near future
         // set the expiry time
@@ -159,7 +157,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     /**
      * @throws \Exception
      */
-    public function getBase64Data(FileData $fileData, PoliciesStruct $policiesStruct): FileData
+    public function getBase64Data(FileData $fileData): FileData
     {
         /** @var string $filePath */
         $filePath = $this->getFilePath($fileData);
@@ -189,7 +187,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
-    public function getBinaryResponse(FileData $fileData, PoliciesStruct $policiesStruct): Response
+    public function getBinaryResponse(FileData $fileData): Response
     {
         /** @var string $filePath */
         $filePath = $this->getFilePath($fileData);
@@ -228,7 +226,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private function getPath($fileData): string
     {
-        $numOfChars = 3;
+        $numOfChars = 2;
         $baseOffset = 24;
 
         return $this->configurationService->getPath().'/'.$fileData->getBucket()->getIdentifier().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
@@ -263,7 +261,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private function generatePath(FileData $fileData): array
     {
-        $numOfChars = 3;
+        $numOfChars = 2;
         $baseOffset = 24;
 
         $bucketId = $fileData->getBucket()->getIdentifier();
