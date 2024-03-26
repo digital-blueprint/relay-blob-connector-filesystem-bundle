@@ -112,7 +112,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     /**
      * Get HTTP link to binary content.
      *
-     * @param FileData       $fileData       fileData for which a link should be provided
+     * @param FileData $fileData fileData for which a link should be provided
      *
      * @throws \Exception
      */
