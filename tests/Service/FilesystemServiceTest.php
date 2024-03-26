@@ -6,7 +6,6 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
 
 use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
-use Dbp\Relay\BlobBundle\Helper\PoliciesStruct;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
@@ -94,7 +93,7 @@ class FilesystemServiceTest extends WebTestCase
 
         $fileDataSaved = $this->fileSystemService->saveFile($fileData);
 
-        $fileDataGet = $this->fileSystemService->getLink($fileDataSaved, new PoliciesStruct());
+        $fileDataGet = $this->fileSystemService->getLink($fileDataSaved);
 
         $ret = $this->fileSystemService->removeFile($fileData);
         $this->assertTrue($ret);
