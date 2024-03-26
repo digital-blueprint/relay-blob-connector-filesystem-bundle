@@ -1,5 +1,8 @@
-# v0.1.15
+# v0.1.16
+* File directory names were changed from 3 characters to 2 characters
+* `PoliciesStruct` was removed from Blob, the connector was adjusted accordingly
 
+# v0.1.15
 * composer: fix dependency on dbp/relay-blob-bundle
 
 # v0.1.14
