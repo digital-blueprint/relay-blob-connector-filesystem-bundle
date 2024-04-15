@@ -56,10 +56,6 @@ class Kernel extends BaseKernel
             'dbal' => [],
         ]);
 
-        $container->extension('api_platform', [
-            'metadata_backward_compatibility_layer' => false,
-        ]);
-
         $container->extension('dbp_relay_blob_connector_filesystem', [
             'link_url' => '',
         ]);
