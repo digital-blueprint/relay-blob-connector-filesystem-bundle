@@ -1,3 +1,6 @@
+# v0.1.17
+* Add support for api-platform 3.2
+
 # v0.1.16
 * File directory names were changed from 3 characters to 2 characters
 * `PoliciesStruct` was removed from Blob, the connector was adjusted accordingly
