@@ -32,7 +32,7 @@ class FilesystemServiceTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $config = ORMSetup::createAnnotationMetadataConfiguration([__DIR__.'/../../src/Entity'], true);
+        $config = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../../src/Entity'], true);
         $config->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER, true));
         $em = EntityManager::create(
             [
