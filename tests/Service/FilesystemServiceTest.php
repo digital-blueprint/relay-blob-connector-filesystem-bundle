@@ -9,10 +9,6 @@ use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
-use Doctrine\ORM\ORMSetup;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -32,24 +28,6 @@ class FilesystemServiceTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $config = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../../src/Entity'], true);
-        $config->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER, true));
-        $em = EntityManager::create(
-            [
-                'driver' => 'pdo_sqlite',
-                'memory' => true,
-            ], $config
-        );
-        $em->getConnection()->executeQuery('CREATE TABLE blob_connector_filesystem (
-              identifier varchar(50) NOT NULL,
-              valid_until DATETIME NOT NULL,
-              link varchar(255) NOT NULL,
-              file_data_identifier varchar(255) NOT NULL,
-              filesystem_path varchar(255) NOT NULL, PRIMARY KEY(identifier))');
-
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->expects($this->any())->method('getManager')->willReturn($em);
-
         $config = ['path' => dirname(__FILE__), 'link_url' => 'http://localhost:8000/', 'link_expire_time' => 'P7D'];
         $this->configurationService = new ConfigurationService();
         $this->configurationService->setConfig($config);
