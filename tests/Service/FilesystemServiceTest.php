@@ -10,6 +10,7 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
@@ -26,15 +27,27 @@ class FilesystemServiceTest extends WebTestCase
      */
     private $fileSystemService;
 
+    private Filesystem $filesystem;
+    private string $tempDir;
+
     protected function setUp(): void
     {
-        $config = ['path' => dirname(__FILE__), 'link_url' => 'http://localhost:8000/', 'link_expire_time' => 'P7D'];
+        $this->filesystem = new Filesystem();
+        $this->tempDir = sys_get_temp_dir().'/'.uniqid('test_', true);
+        $this->filesystem->mkdir($this->tempDir);
+
+        $config = ['path' => $this->tempDir, 'link_url' => 'http://localhost:8000/', 'link_expire_time' => 'P7D'];
         $this->configurationService = new ConfigurationService();
         $this->configurationService->setConfig($config);
 
         $slugger = new AsciiSlugger();
 
         $this->fileSystemService = new FilesystemService($this->configurationService, $slugger);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->filesystem->remove($this->tempDir);
     }
 
     private function getExampleFile(): UploadedFile
