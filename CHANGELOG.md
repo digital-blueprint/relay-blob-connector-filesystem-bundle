@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.19
+* Remove unused dependencies
+* Some test cleanups
+
 ## v0.1.17
 * Add support for api-platform 3.2
 
