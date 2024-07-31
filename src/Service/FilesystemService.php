@@ -294,6 +294,75 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $numOfFiles;
     }
 
+    /**
+     * Gets sum of filesizes and number of files that are saved in the filesystem for a given bucket
+     * First value is the sum of filesizes, second value is the number of files.
+     *
+     * There are functions available that return this values separately, but if you need both,
+     * this function provides better performance
+     *
+     * @return array|int[]
+     */
+    public function getSumOfFilesizesAndNumberOfFilesOfBucket(Bucket $bucket): array
+    {
+        // size of all files in the filesystem
+        $sumOfFileSizes = 0;
+        // number of all files in the filesystem
+        $numOfFiles = 0;
+
+        // check if directory exists
+        if (!is_dir($this->configurationService->getPath().'/'.$bucket->getIdentifier())) {
+            return [0, 0];
+        }
+
+        /* iterate over first level of subdirectories in bucket dir, if no failure */
+        $subdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier());
+
+        if (!$subdirs) {
+            return [-1, -1];
+        }
+        foreach ($subdirs as $subdir) {
+            if ($subdir === '.' || $subdir === '..') {
+                continue;
+            }
+
+            /* iterate over second level of subdirectories in bucket dir, if no failure */
+            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir);
+            if (!$subsubdirs) {
+                return [-1, -1];
+            }
+            // check if files other than . and .. are available
+            if (count($subsubdirs) <= 2) {
+                continue;
+            }
+            foreach ($subsubdirs as $subsubdir) {
+                if ($subsubdir === '.' || $subsubdir === '..') {
+                    continue;
+                }
+
+                /* iterate over all files if some are available and if no failure */
+                $files = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir);
+                if (!$files) {
+                    return [-1, -1];
+                }
+                // check if files other than . and .. are available
+                if (count($files) <= 2) {
+                    continue;
+                }
+                $numOfFiles += (count($files) - 2);
+                foreach ($files as $file) {
+                    if ($file === '.' || $file === '..') {
+                        continue;
+                    }
+
+                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir.'/'.$file);
+                }
+            }
+        }
+
+        return [$sumOfFileSizes, $numOfFiles];
+    }
+
     public function getBinaryResponse(FileData $fileData): Response
     {
         /** @var string $filePath */
