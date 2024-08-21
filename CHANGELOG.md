@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+* Drop support for Symfony 5
+* Drop support for api-platform 2
+
 ## v0.1.19
 * Remove unused dependencies
 * Some test cleanups
