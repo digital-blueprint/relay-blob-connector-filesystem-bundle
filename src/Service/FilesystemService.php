@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 use Symfony\Component\Mime\MimeTypes;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -25,15 +24,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     private $configurationService;
 
-    /**
-     * @var SluggerInterface
-     */
-    private $slugger;
-
-    public function __construct(ConfigurationService $configurationService, SluggerInterface $slugger)
+    public function __construct(ConfigurationService $configurationService)
     {
         $this->configurationService = $configurationService;
-        $this->slugger = $slugger;
     }
 
     /**
@@ -444,8 +437,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $id = $fileData->getIdentifier();
         $folder = substr($id, $baseOffset, $numOfChars);
         $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
-        $safeFilename = $this->slugger->slug($id);
-        $newFilename = $safeFilename.'';
         $destination = $this->configurationService->getPath();
         if (substr($destination, -1) !== '/') {
             $destination .= '/';
@@ -453,7 +444,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         $destination = $destination.$bucketId.'/'.$folder.'/'.$nextFolder;
 
-        return ['destination' => $destination, 'filename' => $newFilename];
+        return ['destination' => $destination, 'filename' => $id];
     }
 
     private function generateContentUrl(string $id): string
