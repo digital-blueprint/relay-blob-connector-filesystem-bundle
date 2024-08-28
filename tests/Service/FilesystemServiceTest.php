@@ -84,7 +84,7 @@ class FilesystemServiceTest extends WebTestCase
 
         $fileDataSaved = $this->fileSystemService->saveFile($fileData);
 
-        $fileDataGet = $this->fileSystemService->getLink($fileDataSaved);
+        $this->fileSystemService->getLink($fileDataSaved);
 
         $ret = $this->fileSystemService->removeFile($fileData);
         $this->assertTrue($ret);

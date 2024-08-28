@@ -458,8 +458,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private function generateContentUrl(string $id): string
     {
-        $link = $this->configurationService->getLinkUrl();
-
         return '/blob/filesystem/'.$id;
     }
 
