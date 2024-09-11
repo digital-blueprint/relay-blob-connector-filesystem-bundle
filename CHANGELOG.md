@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.21
+* Fix version lock on `symfony/http-foundation`
+
 ## v0.1.20
 * Drop support for Symfony 5
 * Drop support for api-platform 2
