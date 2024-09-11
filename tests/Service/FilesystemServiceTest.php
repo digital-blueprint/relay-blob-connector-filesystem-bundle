@@ -69,7 +69,6 @@ class FilesystemServiceTest extends WebTestCase
     {
         $bucket = new Bucket();
         $bucket->setLinkExpireTime('P1D');
-        $bucket->setMaxRetentionDuration('P1Y');
         $bucket->setKey('v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir');
         $bucket->setIdentifier((string) Uuid::v4());
         $fileDataId = (string) Uuid::v4();
@@ -78,9 +77,7 @@ class FilesystemServiceTest extends WebTestCase
         $fileData->setFile($this->getExampleFile());
         $fileData->setBucket($bucket);
 
-        $now = new \DateTimeImmutable('now');
-
-        $fileData->setExistsUntil($now->add(new \DateInterval($bucket->getMaxRetentionDuration())));
+        $fileData->setDeleteAt(null);
 
         $fileDataSaved = $this->fileSystemService->saveFile($fileData);
 
