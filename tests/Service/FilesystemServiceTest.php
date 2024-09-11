@@ -77,8 +77,6 @@ class FilesystemServiceTest extends WebTestCase
         $fileData->setFile($this->getExampleFile());
         $fileData->setBucket($bucket);
 
-        $fileData->setDeleteAt(null);
-
         $fileDataSaved = $this->fileSystemService->saveFile($fileData);
 
         $this->fileSystemService->getLink($fileDataSaved);
