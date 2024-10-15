@@ -6,7 +6,7 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Helper;
 
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
 
 class FileOperations
@@ -20,7 +20,7 @@ class FileOperations
         return count(scandir($dir)) === 2;
     }
 
-    public static function moveFile(UploadedFile $uploadedFile, string $dest, string $name)
+    public static function moveFile(File $uploadedFile, string $dest, string $name)
     {
         try {
             $uploadedFile->move($dest, $name);
