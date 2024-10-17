@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.22
+* Allow passing a File instead of an UploadedFile
+
 ## v0.1.21
 * Fix version lock on `symfony/http-foundation`
 
