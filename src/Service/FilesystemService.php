@@ -6,7 +6,6 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
-use Dbp\Relay\BlobBundle\Helper\DenyAccessUnlessCheckSignature;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
@@ -38,20 +37,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } catch (\Exception $e) {
             throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
         }
-
-        // the file link should expire in the near future
-        // set the expiry time
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
-
-        $payload = [
-            'identifier' => $fileData->getIdentifier(),
-            'validUntil' => $now,
-        ];
-
-        // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
-        $fileData->setContentUrl($contentUrl);
 
         // move file to correct destination
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
@@ -360,20 +345,5 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $destination = $destination.$bucketId.'/'.$folder.'/'.$nextFolder;
 
         return ['destination' => $destination, 'filename' => $id];
-    }
-
-    private function generateContentUrl(string $id): string
-    {
-        return '/blob/filesystem/'.$id;
-    }
-
-    private function generateContentUrlWithExpiry(string $id, string $validUntil): string
-    {
-        return $this->generateContentUrl($id).'?validUntil='.$validUntil;
-    }
-
-    private function generateSignedContentUrl(string $id, string $validUntil, string $signature): string
-    {
-        return $this->generateContentUrlWithExpiry($id, $validUntil).'&sig='.$signature;
     }
 }
