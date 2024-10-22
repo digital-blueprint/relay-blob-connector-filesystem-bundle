@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
 
-use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
@@ -67,15 +66,10 @@ class FilesystemServiceTest extends WebTestCase
 
     public function testSaveGetRemoveFile()
     {
-        $bucket = new Bucket();
-        $bucket->setLinkExpireTime('P1D');
-        $bucket->setKey('v3fbdbyf2f0muqvl0t2mdixlteaxs45fsicrczavbec95fsr9rtx3x89fum1euir');
-        $bucket->setIdentifier((string) Uuid::v4());
         $fileDataId = (string) Uuid::v4();
         $fileData = new FileData();
         $fileData->setIdentifier($fileDataId);
         $fileData->setFile($this->getExampleFile());
-        $fileData->setBucket($bucket);
 
         $this->fileSystemService->saveFile($fileData);
 

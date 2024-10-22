@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
-use Dbp\Relay\BlobBundle\Entity\Bucket;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
@@ -97,18 +96,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $fileData;
     }
 
-    public function getSumOfFilesizesOfBucket(Bucket $bucket): int
+    public function getSumOfFilesizesOfBucket(string $bucketId): int
     {
         // size of all files in the filesystem
         $sumOfFileSizes = 0;
 
         // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$bucket->getIdentifier())) {
+        if (!is_dir($this->configurationService->getPath().'/'.$bucketId)) {
             return 0;
         }
 
         /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier());
+        $subdirs = scandir($this->configurationService->getPath().'/'.$bucketId);
         if (!$subdirs) {
             return -1;
         }
@@ -118,7 +117,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             }
 
             /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir);
+            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir);
             if (!$subsubdirs) {
                 return -1;
             }
@@ -132,7 +131,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 }
 
                 /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir);
+                $files = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir);
                 if (!$files) {
                     return -1;
                 }
@@ -145,7 +144,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                         continue;
                     }
 
-                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir.'/'.$file);
+                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir.'/'.$file);
                 }
             }
         }
@@ -153,18 +152,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $sumOfFileSizes;
     }
 
-    public function getNumberOfFilesInBucket(Bucket $bucket): int
+    public function getNumberOfFilesInBucket(string $bucketId): int
     {
         // size of all files in the filesystem
         $numOfFiles = 0;
 
         // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$bucket->getIdentifier())) {
+        if (!is_dir($this->configurationService->getPath().'/'.$bucketId)) {
             return 0;
         }
 
         /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier());
+        $subdirs = scandir($this->configurationService->getPath().'/'.$bucketId);
         if (!$subdirs) {
             return -1;
         }
@@ -174,7 +173,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             }
 
             /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir);
+            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir);
             if (!$subsubdirs) {
                 return -1;
             }
@@ -188,7 +187,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 }
 
                 /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir);
+                $files = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir);
                 if (!$files) {
                     return -1;
                 }
@@ -212,7 +211,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
      *
      * @return array|int[]
      */
-    public function getSumOfFilesizesAndNumberOfFilesOfBucket(Bucket $bucket): array
+    public function getSumOfFilesizesAndNumberOfFilesOfBucket(string $bucketId): array
     {
         // size of all files in the filesystem
         $sumOfFileSizes = 0;
@@ -220,12 +219,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $numOfFiles = 0;
 
         // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$bucket->getIdentifier())) {
+        if (!is_dir($this->configurationService->getPath().'/'.$bucketId)) {
             return [0, 0];
         }
 
         /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier());
+        $subdirs = scandir($this->configurationService->getPath().'/'.$bucketId);
 
         if (!$subdirs) {
             return [-1, -1];
@@ -236,7 +235,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             }
 
             /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir);
+            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir);
             if (!$subsubdirs) {
                 return [-1, -1];
             }
@@ -250,7 +249,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 }
 
                 /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir);
+                $files = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir);
                 if (!$files) {
                     return [-1, -1];
                 }
@@ -264,7 +263,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                         continue;
                     }
 
-                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$bucket->getIdentifier().'/'.$subdir.'/'.$subsubdir.'/'.$file);
+                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir.'/'.$file);
                 }
             }
         }
