@@ -314,7 +314,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $numOfChars = 2;
         $baseOffset = 24;
 
-        return $this->configurationService->getPath().'/'.$fileData->getBucket()->getIdentifier().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
+        return $this->configurationService->getPath().'/'.$fileData->getInternalBucketID().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
     }
 
     public function removeFile(FileData $fileData): bool
@@ -333,7 +333,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $numOfChars = 2;
         $baseOffset = 24;
 
-        $bucketId = $fileData->getBucket()->getIdentifier();
+        $bucketId = $fileData->getInternalBucketID();
         $id = $fileData->getIdentifier();
         $folder = substr($id, $baseOffset, $numOfChars);
         $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
