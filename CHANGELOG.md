@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.23
+* Remove unused 'link_url' config option
+* Update for blob API changes
+
 ## v0.1.22
 * Allow passing a File instead of an UploadedFile
 
