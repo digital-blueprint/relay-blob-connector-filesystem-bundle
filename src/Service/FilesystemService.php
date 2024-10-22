@@ -11,7 +11,6 @@ use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
@@ -56,74 +55,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         // move file to correct destination
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
-
-        return $fileData;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function saveFileFromString(FileData $fileData, string $data): ?FileData
-    {
-        try {
-            $destinationFilenameArray = $this->generatePath($fileData);
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
-        }
-
-        // the file link should expire in the near future
-        // set the expiry time
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
-
-        $payload = [
-            'identifier' => $fileData->getIdentifier(),
-            'validUntil' => $now,
-        ];
-
-        // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
-        $fileData->setContentUrl($contentUrl);
-
-        // move file to correct destination
-        FileOperations::saveFileFromString($data, $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
-
-        try {
-            $fileData->setFile(new File($destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename']));
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'File could not be found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
-        }
-
-        return $fileData;
-    }
-
-    public function renameFile(FileData $fileData): ?FileData
-    {
-        // No action required here because it is only saved in blobBundle
-        return $fileData;
-    }
-
-    /**
-     * Get HTTP link to binary content.
-     *
-     * @param FileData $fileData fileData for which a link should be provided
-     *
-     * @throws \Exception
-     */
-    public function getLink(FileData $fileData): ?FileData
-    {
-        // the file link should expire in the near future
-        // set the expiry time
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
-
-        $payload = [
-            'ucs' => $this->generateChecksumFromFileData($fileData, $now->format('c')),
-        ];
-
-        // set content url
-        $contentUrl = $this->generateSignedContentUrl($fileData->getIdentifier(), rawurlencode($now->format('c')), DenyAccessUnlessCheckSignature::create($fileData->getBucket()->getKey(), $payload));
-        $fileData->setContentUrl($this->configurationService->getLinkUrl().substr($contentUrl, 1));
 
         return $fileData;
     }
@@ -410,22 +341,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         FileOperations::removeFile($path, $destinationFilenameArray['destination']);
 
         return true;
-    }
-
-    public function generateChecksumFromFileData($fileData, $validUntil = ''): ?string
-    {
-        // if no validUntil is given, use bucket link expiry time per default
-        if ($validUntil === '') {
-            $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-            $now = $now->add(new \DateInterval($fileData->getBucket()->getLinkExpireTime()));
-            $validUntil = $now->format('c');
-        }
-
-        // create url to hash
-        $contentUrl = '/blob/filesystem/'.$fileData->getIdentifier().'?validUntil='.rawurlencode($validUntil);
-
-        // create sha256 hash
-        return hash('sha256', $contentUrl);
     }
 
     private function generatePath(FileData $fileData): array
