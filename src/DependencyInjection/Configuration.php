@@ -19,9 +19,6 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('path')
                         ->defaultValue('blobFiles')
                     ->end()
-                    ->scalarNode('link_url')
-                        ->isRequired()
-                    ->end()
                 ->end()
             ->end();
 

@@ -49,7 +49,6 @@ class Kernel extends BaseKernel
         ]);
 
         $container->extension('dbp_relay_blob_connector_filesystem', [
-            'link_url' => '',
         ]);
     }
 }

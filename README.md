@@ -49,7 +49,6 @@ content:
 ```yaml
 dbp_relay_blob_connector_filesystem:
   path: '%kernel.project_dir%/var/blobFiles' # path where files should be placed
-  link_url: 'http://localhost:8000/' # base link_url of the api
 ```
 
 For more info on bundle configuration see <https://symfony.com/doc/current/bundles/configuration.html>.

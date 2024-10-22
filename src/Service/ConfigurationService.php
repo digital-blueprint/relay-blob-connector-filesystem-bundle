@@ -25,9 +25,4 @@ class ConfigurationService
     {
         return $this->config['path'];
     }
-
-    public function getLinkUrl(): string
-    {
-        return $this->config['link_url'];
-    }
 }

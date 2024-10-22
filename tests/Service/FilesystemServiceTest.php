@@ -36,7 +36,7 @@ class FilesystemServiceTest extends WebTestCase
         $this->tempDir = sys_get_temp_dir().'/'.uniqid('test_', true);
         $this->filesystem->mkdir($this->tempDir);
 
-        $config = ['path' => $this->tempDir, 'link_url' => 'http://localhost:8000/', 'link_expire_time' => 'P7D'];
+        $config = ['path' => $this->tempDir];
         $this->configurationService = new ConfigurationService();
         $this->configurationService->setConfig($config);
 
