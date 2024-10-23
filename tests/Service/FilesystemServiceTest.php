@@ -11,7 +11,6 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Uid\Uuid;
 
 class FilesystemServiceTest extends WebTestCase
@@ -38,10 +37,7 @@ class FilesystemServiceTest extends WebTestCase
         $config = ['path' => $this->tempDir];
         $this->configurationService = new ConfigurationService();
         $this->configurationService->setConfig($config);
-
-        $slugger = new AsciiSlugger();
-
-        $this->fileSystemService = new FilesystemService($this->configurationService, $slugger);
+        $this->fileSystemService = new FilesystemService($this->configurationService);
     }
 
     protected function tearDown(): void
