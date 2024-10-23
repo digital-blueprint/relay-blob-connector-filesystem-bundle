@@ -54,19 +54,39 @@ class FilesystemServiceTest extends WebTestCase
         return $uploadedFile;
     }
 
+    private function getAllPaths(): array
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->bucketDir, \RecursiveDirectoryIterator::SKIP_DOTS|\FilesystemIterator::CURRENT_AS_SELF),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        $paths = [];
+        foreach ($iterator as $item) {
+            $paths[] = $item->getSubPathname();
+        }
+        sort($paths);
+        return $paths;
+    }
+
     public function testSaveGetRemoveFile()
     {
-        $fileDataId = (string) Uuid::v4();
+        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
         $fileData = new FileData();
         $fileData->setIdentifier($fileDataId);
         $fileData->setFile($this->getExampleFile());
+        $this->assertSame([], $this->getAllPaths());
 
         $this->fileSystemService->saveFile($fileData);
+        $this->assertSame([
+            'a9',
+            'a9/11',
+            'a9/11/0192b970-cd6d-726d-a258-a911c5aac1b7',
+        ], $this->getAllPaths());
 
         $ret = $this->fileSystemService->removeFile($fileData);
         $this->assertTrue($ret);
-
-        // check dir empty
-        $this->assertNull(FileOperations::isDirEmpty('testfile'));
+        $this->assertSame([
+            'a9',
+        ], $this->getAllPaths());
     }
 }
