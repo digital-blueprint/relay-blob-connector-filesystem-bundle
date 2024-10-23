@@ -10,31 +10,30 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Uid\Uuid;
 
 class FilesystemServiceTest extends WebTestCase
 {
-    /**
-     * @var ConfigurationService
-     */
-    private $configurationService;
+    private ConfigurationService $configurationService;
 
-    /**
-     * @var FilesystemService
-     */
-    private $fileSystemService;
+    private FilesystemService $fileSystemService;
 
     private Filesystem $filesystem;
     private string $tempDir;
+    private string $bucketDir;
+    private string $uploadDir;
 
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
         $this->tempDir = sys_get_temp_dir().'/'.uniqid('test_', true);
-        $this->filesystem->mkdir($this->tempDir);
+        $this->bucketDir = $this->tempDir . '/bucket';
+        $this->uploadDir = $this->tempDir . '/upload';
+        $this->filesystem->mkdir($this->bucketDir);
+        $this->filesystem->mkdir($this->uploadDir);
 
-        $config = ['path' => $this->tempDir];
+        $config = ['path' => $this->bucketDir];
         $this->configurationService = new ConfigurationService();
         $this->configurationService->setConfig($config);
         $this->fileSystemService = new FilesystemService($this->configurationService);
@@ -45,18 +44,13 @@ class FilesystemServiceTest extends WebTestCase
         $this->filesystem->remove($this->tempDir);
     }
 
-    private function getExampleFile(): UploadedFile
+    private function getExampleFile(): File
     {
-        $examplePath = dirname(__FILE__).DIRECTORY_SEPARATOR.'test.pdf';
-        // copy file for testing
-        $file = dirname(__FILE__).DIRECTORY_SEPARATOR.'test_original.pdf';
-
-        if (!copy($file, $examplePath)) {
-            assert('Copy testfile went wrong');
-        }
-
-        $uploadedFile = new UploadedFile($examplePath, 'test', 'pdf', null, true);
-
+        $filesystem = new Filesystem();
+        $tempFile = $filesystem->tempnam($this->uploadDir, 'blob_fs_');
+        $file = dirname(__FILE__).DIRECTORY_SEPARATOR.'test.pdf';
+        $this->assertTrue(copy($file, $tempFile), 'Copy testfile went wrong');
+        $uploadedFile = new File($tempFile, true);
         return $uploadedFile;
     }
 
