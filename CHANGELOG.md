@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.24
+
+* Fail in case a file is not found when deleting it
+* Stop throwing ApiErrors in the connector and leave that to the blob bundle
+* Adjust for blob API changes
+* Remove fallback code for old filename format (pre v0.1.7)
+* Clean up docs
+
 ## v0.1.23
 * Remove unused 'link_url' config option
 * Update for blob API changes
