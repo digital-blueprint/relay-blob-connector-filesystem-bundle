@@ -7,7 +7,6 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
-use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -31,14 +30,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
      */
     public function saveFile(FileData $fileData): void
     {
-        try {
-            $destinationFilenameArray = $this->generatePath($fileData);
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'Path could not be generated', 'blob-connector-filesystem:path-not-generated', ['message' => $e->getMessage()]);
-        }
+        $destinationFilenameArray = $this->generatePath($fileData);
 
-        // move file to correct destination
-        FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
+        $fileData->getFile()->move($destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
     }
 
     public function getFilePath(FileData $fileData): string
@@ -196,31 +190,27 @@ class FilesystemService implements DatasystemProviderServiceInterface
         /** @var string $filePath */
         $filePath = $this->getFilePath($fileData);
 
-        try {
-            $response = new BinaryFileResponse($filePath);
-            $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+        $response = new BinaryFileResponse($filePath);
+        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
-            // Set the mimetype with the guesser or manually
-            if ($mimeTypeGuesser->isGuesserSupported()) {
-                // Guess the mimetype of the file according to the extension of the file
-                $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
-            } elseif ($fileData->getMimeType()) {
-                // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
-                $response->headers->set('Content-Type', $fileData->getMimeType());
-            } else {
-                // Set the mimetype of the file manually, in this case for a text file is text/plain
-                $response->headers->set('Content-Type', 'text/plain');
-            }
-
-            $filename = $fileData->getFileName();
-
-            $response->setContentDisposition(
-                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                $filename
-            );
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
+        // Set the mimetype with the guesser or manually
+        if ($mimeTypeGuesser->isGuesserSupported()) {
+            // Guess the mimetype of the file according to the extension of the file
+            $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
+        } elseif ($fileData->getMimeType()) {
+            // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
+            $response->headers->set('Content-Type', $fileData->getMimeType());
+        } else {
+            // Set the mimetype of the file manually, in this case for a text file is text/plain
+            $response->headers->set('Content-Type', 'text/plain');
         }
+
+        $filename = $fileData->getFileName();
+
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $filename
+        );
 
         return $response;
     }

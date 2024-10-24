@@ -7,7 +7,6 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
-use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -136,7 +135,7 @@ class FilesystemServiceTest extends WebTestCase
         $fileData->setFile($this->getExampleFile());
         $fileData->setMimeType('image/jpeg');
 
-        $this->expectException(ApiError::class);
+        $this->expectException(\Exception::class);
         $this->fileSystemService->getBinaryResponse($fileData);
     }
 
