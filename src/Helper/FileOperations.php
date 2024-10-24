@@ -28,17 +28,4 @@ class FileOperations
             throw ApiError::withDetails(Response::HTTP_BAD_REQUEST, 'File could not be uploaded', 'blob-connector-filesystem:save-file-error', ['message' => $e->getMessage()]);
         }
     }
-
-    public static function removeFile(string $path, string $folder)
-    {
-        // Remove File from server
-        if (file_exists($path)) {
-            unlink($path);
-        }
-
-        // Remove folder if empty
-        if (self::isDirEmpty($folder)) {
-            rmdir($folder);
-        }
-    }
 }

@@ -242,7 +242,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $destinationFilenameArray = $this->generatePath($fileData);
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 
-        FileOperations::removeFile($path, $destinationFilenameArray['destination']);
+        if (!file_exists($path)) {
+            throw new \RuntimeException('File does not exist: '.$path);
+        } else {
+            unlink($path);
+        }
+
+        // Remove folder if empty
+        $folder = $destinationFilenameArray['destination'];
+        if (FileOperations::isDirEmpty($folder)) {
+            rmdir($folder);
+        }
     }
 
     private function generatePath(FileData $fileData): array

@@ -167,4 +167,20 @@ class FilesystemServiceTest extends WebTestCase
         $this->assertSame(0, $sumSize);
         $this->assertSame(0, $numFiles);
     }
+
+    public function testRemoveLostFile()
+    {
+        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $fileData = new FileData();
+        $fileData->setIdentifier($fileDataId);
+        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
+        $fileData->setFile($this->getExampleFile());
+        $this->fileSystemService->saveFile($fileData);
+
+        $path = $this->fileSystemService->getFilePath($fileData);
+        unlink($path);
+
+        $this->expectException(\Exception::class);
+        $this->fileSystemService->removeFile($fileData);
+    }
 }
