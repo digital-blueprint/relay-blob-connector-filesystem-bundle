@@ -6,7 +6,6 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
-use Dbp\Relay\BlobConnectorFilesystemBundle\Helper\FileOperations;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -238,10 +237,15 @@ class FilesystemService implements DatasystemProviderServiceInterface
             unlink($path);
         }
 
-        // Remove folder if empty
+        // Try to remove folder if empty
         $folder = $destinationFilenameArray['destination'];
-        if (FileOperations::isDirEmpty($folder)) {
-            rmdir($folder);
+        $res = scandir($folder);
+        // It migth be someone else was just deleting it, so we need to ignore the error here
+        if ($res !== false) {
+            $isEmpty = count($res) === 2;
+            if ($isEmpty) {
+                rmdir($folder);
+            }
         }
     }
 
