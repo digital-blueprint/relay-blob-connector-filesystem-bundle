@@ -31,12 +31,6 @@
         "vimeo/psalm": "^5.22.2",
         "ext-pdo_sqlite": "*"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/digital-blueprint/relay-blob-bundle.git"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Dbp\\Relay\\BlobConnectorFilesystemBundle\\": "src/"
