@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
-use Symfony\Component\Mime\MimeTypes;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -36,22 +35,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function getFilePath(FileData $fileData): string
     {
-        $filePath = $this->getPath($fileData);
+        $numOfChars = 2;
+        $baseOffset = 24;
 
-        // if file doesnt exist, then the same file with extension should exist
-        // file extensions were removed in version v0.1.7
-        if (!file_exists($filePath)) {
-            $mimeTypeToExt = new MimeTypes();
-            $types = $mimeTypeToExt->getExtensions($fileData->getMimeType());
-            foreach ($types as $ext) {
-                $newPath = $filePath.'.'.$ext;
-                if (file_exists($newPath)) {
-                    $filePath = $newPath;
-                }
-            }
-        }
-
-        return $filePath;
+        return $this->configurationService->getPath().'/'.$fileData->getInternalBucketID().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
     }
 
     public function getContentUrl(FileData $fileData): string
@@ -212,17 +199,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         );
 
         return $response;
-    }
-
-    /**
-     * @param $fileData FileData
-     */
-    private function getPath($fileData): string
-    {
-        $numOfChars = 2;
-        $baseOffset = 24;
-
-        return $this->configurationService->getPath().'/'.$fileData->getInternalBucketID().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
     }
 
     public function removeFile(FileData $fileData): void
