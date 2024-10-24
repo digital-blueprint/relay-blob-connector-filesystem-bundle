@@ -87,8 +87,7 @@ class FilesystemServiceTest extends WebTestCase
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9/11/0192b970-cd6d-726d-a258-a911c5aac1b7',
         ], $this->getAllPaths());
 
-        $ret = $this->fileSystemService->removeFile($fileData);
-        $this->assertTrue($ret);
+        $this->fileSystemService->removeFile($fileData);
         $this->assertSame([
             '154cc850-ede8-4c10-bff5-4e24f2ef6087',
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9',
@@ -104,10 +103,9 @@ class FilesystemServiceTest extends WebTestCase
         $fileData->setFile($this->getExampleFile());
         $this->fileSystemService->saveFile($fileData);
 
-        $this->assertFalse((bool) $fileData->getContentUrl());
-        $this->fileSystemService->getBase64Data($fileData);
-        $this->assertNotEmpty($fileData->getContentUrl());
-        $this->assertStringContainsString('data:application/pdf;', $fileData->getContentUrl());
+        $url = $this->fileSystemService->getContentUrl($fileData);
+        $this->assertNotEmpty($url);
+        $this->assertStringContainsString('data:application/pdf;', $url);
     }
 
     public function testGetBinaryResponse()

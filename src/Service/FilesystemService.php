@@ -29,7 +29,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     /**
      * @throws \Exception
      */
-    public function saveFile(FileData $fileData): ?FileData
+    public function saveFile(FileData $fileData): void
     {
         try {
             $destinationFilenameArray = $this->generatePath($fileData);
@@ -39,8 +39,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         // move file to correct destination
         FileOperations::moveFile($fileData->getFile(), $destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
-
-        return $fileData;
     }
 
     public function getFilePath(FileData $fileData): string
@@ -63,37 +61,28 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $filePath;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function getBase64Data(FileData $fileData): FileData
+    public function getContentUrl(FileData $fileData): string
     {
         /** @var string $filePath */
         $filePath = $this->getFilePath($fileData);
 
-        try {
-            // build binary response
-            $file = file_get_contents($filePath);
-            $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+        // build binary response
+        $file = file_get_contents($filePath);
+        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
-            // Set the mimetype with the guesser or manually
-            if ($mimeTypeGuesser->isGuesserSupported()) {
-                // Guess the mimetype of the file according to the extension of the file
-                $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
-            } elseif ($fileData->getMimeType()) {
-                // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
-                $mimeType = $fileData->getMimeType();
-            } else {
-                // Set the mimetype of the file manually, in this case for a text file is text/plain
-                $mimeType = 'text/plain';
-            }
-
-            $fileData->setContentUrl('data:'.$mimeType.';base64,'.base64_encode($file));
-        } catch (\Exception $e) {
-            throw ApiError::withDetails(Response::HTTP_NOT_FOUND, 'File was not found', 'blob-connector-filesystem:file-not-found', ['message' => $e->getMessage()]);
+        // Set the mimetype with the guesser or manually
+        if ($mimeTypeGuesser->isGuesserSupported()) {
+            // Guess the mimetype of the file according to the extension of the file
+            $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
+        } elseif ($fileData->getMimeType()) {
+            // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
+            $mimeType = $fileData->getMimeType();
+        } else {
+            // Set the mimetype of the file manually, in this case for a text file is text/plain
+            $mimeType = 'text/plain';
         }
 
-        return $fileData;
+        return 'data:'.$mimeType.';base64,'.base64_encode($file);
     }
 
     public function getSumOfFilesizesOfBucket(string $bucketId): int
@@ -247,15 +236,13 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $this->configurationService->getPath().'/'.$fileData->getInternalBucketID().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
     }
 
-    public function removeFile(FileData $fileData): bool
+    public function removeFile(FileData $fileData): void
     {
         // Delete the file
         $destinationFilenameArray = $this->generatePath($fileData);
         $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
 
         FileOperations::removeFile($path, $destinationFilenameArray['destination']);
-
-        return true;
     }
 
     private function generatePath(FileData $fileData): array
