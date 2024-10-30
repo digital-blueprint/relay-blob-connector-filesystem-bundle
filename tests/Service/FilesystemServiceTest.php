@@ -182,4 +182,19 @@ class FilesystemServiceTest extends WebTestCase
         $this->expectException(\Exception::class);
         $this->fileSystemService->removeFile($fileData);
     }
+
+    public function testFailIfPathDoesntExist()
+    {
+        // In case the configured path doesn't exist we should fail and not silently create it
+        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $fileData = new FileData();
+        $fileData->setIdentifier($fileDataId);
+        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
+        $fileData->setFile($this->getExampleFile());
+
+        $this->filesystem->remove($this->bucketDir);
+
+        $this->expectException(\Exception::class);
+        $this->fileSystemService->saveFile($fileData);
+    }
 }

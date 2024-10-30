@@ -7,3 +7,7 @@ services:
   Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService:
     autowire: true
     autoconfigure: true
+
+  Dbp\Relay\BlobConnectorFilesystemBundle\Service\HealthCheck:
+    autowire: true
+    autoconfigure: true

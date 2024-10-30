@@ -24,12 +24,30 @@ class FilesystemService implements DatasystemProviderServiceInterface
     }
 
     /**
+     * Check if the configured target path is usable.
+     */
+    public function checkPath(): void
+    {
+        $path = $this->configurationService->getPath();
+        if (!file_exists($path)) {
+            throw new \RuntimeException("$path does not exist");
+        } elseif (!is_dir($path)) {
+            throw new \RuntimeException("$path is not a directory");
+        } elseif (!is_readable($path)) {
+            throw new \RuntimeException("$path is not readable");
+        } elseif (!is_writable($path)) {
+            throw new \RuntimeException("$path is not writable");
+        }
+    }
+
+    /**
      * @throws \Exception
      */
     public function saveFile(FileData $fileData): void
     {
         $destinationFilenameArray = $this->generatePath($fileData);
 
+        $this->checkPath();
         $fileData->getFile()->move($destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
     }
 
