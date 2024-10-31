@@ -40,15 +40,33 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    /**
-     * @throws \Exception
-     */
     public function saveFile(FileData $fileData): void
     {
+        $this->checkPath();
         $destinationFilenameArray = $this->generatePath($fileData);
 
-        $this->checkPath();
-        $fileData->getFile()->move($destinationFilenameArray['destination'], $destinationFilenameArray['filename']);
+        // Create all directories except the root
+        $root = $destinationFilenameArray['root'];
+        $dirs = $destinationFilenameArray['dirs'];
+        $currentDir = $root;
+        foreach ($dirs as $dir) {
+            $currentDir .= '/'.$dir;
+            if (!file_exists($currentDir)) {
+                // In case something else created the dir in the meantime, mkdir will fail, so check again afterward
+                if (mkdir($currentDir) !== true && !file_exists($currentDir)) {
+                    throw new \RuntimeException("Unable to create $currentDir");
+                }
+            }
+        }
+
+        // Move the file into place
+        $src = $fileData->getFile()->getPathname();
+        $target = $destinationFilenameArray['path'];
+        $renamed = rename($src, $target);
+        if (!$renamed) {
+            throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $src, $target));
+        }
+        @chmod($target, 0o666 & ~umask());
     }
 
     public function getFilePath(FileData $fileData): string
@@ -222,8 +240,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     public function removeFile(FileData $fileData): void
     {
         // Delete the file
-        $destinationFilenameArray = $this->generatePath($fileData);
-        $path = $destinationFilenameArray['destination'].'/'.$destinationFilenameArray['filename'];
+        $path = $this->generatePath($fileData)['path'];
 
         if (!file_exists($path)) {
             throw new \RuntimeException('File does not exist: '.$path);
@@ -241,13 +258,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $id = $fileData->getIdentifier();
         $folder = substr($id, $baseOffset, $numOfChars);
         $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
-        $destination = $this->configurationService->getPath();
-        if (substr($destination, -1) !== '/') {
-            $destination .= '/';
-        }
+        $destination = rtrim($this->configurationService->getPath(), '/');
 
-        $destination = $destination.$bucketId.'/'.$folder.'/'.$nextFolder;
+        $path = $destination.'/'.$bucketId.'/'.$folder.'/'.$nextFolder.'/'.$id;
 
-        return ['destination' => $destination, 'filename' => $id];
+        return ['root' => $destination, 'dirs' => [$bucketId, $folder, $nextFolder], 'basename' => $id, 'path' => $path];
     }
 }
