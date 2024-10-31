@@ -61,12 +61,48 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         // Move the file into place
         $src = $fileData->getFile()->getPathname();
+        $basename = $destinationFilenameArray['basename'];
+        $tmp = tempnam($currentDir, 'tmp_'.$basename.'_');
+        if ($tmp === false) {
+            throw new \RuntimeException("Unable to create temp file in $currentDir");
+        }
+        // tempnam() can fall back to the system temp dir, which we don't want
+        if (realpath(dirname($tmp)) !== realpath($currentDir)) {
+            @unlink($tmp);
+            throw new \RuntimeException("Unable to create temp file in $currentDir");
+        }
         $target = $destinationFilenameArray['path'];
-        $renamed = rename($src, $target);
+
+        // Move the file to a temp file in the same dir
+        $renamed = rename($src, $tmp);
         if (!$renamed) {
             throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $src, $target));
         }
-        @chmod($target, 0o666 & ~umask());
+        try {
+            @chmod($tmp, 0o666 & ~umask());
+
+            $handle = fopen($tmp, 'r');
+            if ($handle === false) {
+                throw new \RuntimeException(sprintf('Could not open the file "%s".', $tmp));
+            }
+            try {
+                if (fsync($handle) === false) {
+                    throw new \RuntimeException(sprintf('Could not synchronise the file "%s".', $tmp));
+                }
+            } finally {
+                fclose($handle);
+            }
+
+            // Finally move to the target
+            $renamed = rename($tmp, $target);
+            if (!$renamed) {
+                throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $tmp, $target));
+            }
+
+            // fsync() in PHP doesn't support directories, so if we crash after this the client might never know
+        } finally {
+            @unlink($tmp);
+        }
     }
 
     public function getContentUrl(FileData $fileData): string
