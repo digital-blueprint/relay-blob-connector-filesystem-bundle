@@ -230,17 +230,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } else {
             unlink($path);
         }
-
-        // Try to remove folder if empty
-        $folder = $destinationFilenameArray['destination'];
-        $res = scandir($folder);
-        // It migth be someone else was just deleting it, so we need to ignore the error here
-        if ($res !== false) {
-            $isEmpty = count($res) === 2;
-            if ($isEmpty) {
-                rmdir($folder);
-            }
-        }
     }
 
     private function generatePath(FileData $fileData): array

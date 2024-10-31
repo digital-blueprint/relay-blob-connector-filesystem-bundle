@@ -90,6 +90,7 @@ class FilesystemServiceTest extends WebTestCase
         $this->assertSame([
             '154cc850-ede8-4c10-bff5-4e24f2ef6087',
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9',
+            '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9/11',
         ], $this->getAllPaths());
     }
 
