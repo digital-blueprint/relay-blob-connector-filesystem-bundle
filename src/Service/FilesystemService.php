@@ -69,17 +69,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
         @chmod($target, 0o666 & ~umask());
     }
 
-    public function getFilePath(FileData $fileData): string
-    {
-        $numOfChars = 2;
-        $baseOffset = 24;
-
-        return $this->configurationService->getPath().'/'.$fileData->getInternalBucketID().'/'.substr($fileData->getIdentifier(), $baseOffset, $numOfChars).'/'.substr($fileData->getIdentifier(), $baseOffset + $numOfChars, $numOfChars).'/'.$fileData->getIdentifier();
-    }
-
     public function getContentUrl(FileData $fileData): string
     {
-        /** @var string $filePath */
         $filePath = $this->getFilePath($fileData);
 
         // build binary response
@@ -209,7 +200,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function getBinaryResponse(FileData $fileData): Response
     {
-        /** @var string $filePath */
         $filePath = $this->getFilePath($fileData);
 
         $response = new BinaryFileResponse($filePath);
@@ -240,7 +230,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
     public function removeFile(FileData $fileData): void
     {
         // Delete the file
-        $path = $this->generatePath($fileData)['path'];
+        $path = $this->getFilePath($fileData);
 
         if (!file_exists($path)) {
             throw new \RuntimeException('File does not exist: '.$path);
@@ -263,5 +253,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $path = $destination.'/'.$bucketId.'/'.$folder.'/'.$nextFolder.'/'.$id;
 
         return ['root' => $destination, 'dirs' => [$bucketId, $folder, $nextFolder], 'basename' => $id, 'path' => $path];
+    }
+
+    public function getFilePath(FileData $fileData): string
+    {
+        return $this->generatePath($fileData)['path'];
     }
 }
