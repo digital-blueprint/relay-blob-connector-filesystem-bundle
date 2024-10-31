@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "adf870ac8af5687f629dc88642f8a281",
+    "content-hash": "70d4e96461a2ed737a82486f33d9e729",
     "packages": [
         {
             "name": "api-platform/core",
@@ -289,16 +289,16 @@
         },
         {
             "name": "dbp/relay-blob-bundle",
-            "version": "v0.1.61",
+            "version": "v0.1.63",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-bundle.git",
-                "reference": "d943ddde971710d6290342c6cca890aeff5e60f5"
+                "reference": "b451db657ce702d601f4dd11ad7522094834d7fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/d943ddde971710d6290342c6cca890aeff5e60f5",
-                "reference": "d943ddde971710d6290342c6cca890aeff5e60f5",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/b451db657ce702d601f4dd11ad7522094834d7fd",
+                "reference": "b451db657ce702d601f4dd11ad7522094834d7fd",
                 "shasum": ""
             },
             "require": {
@@ -360,9 +360,9 @@
             "description": "A bundle for file-serving, persisting and managing",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-blob-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.61"
+                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.63"
             },
-            "time": "2024-10-24T13:00:55+00:00"
+            "time": "2024-10-31T15:21:02+00:00"
         },
         {
             "name": "dbp/relay-blob-library",
@@ -12888,7 +12888,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -12901,5 +12901,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.2.0"
 }

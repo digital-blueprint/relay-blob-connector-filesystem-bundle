@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
-use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
 
 class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -40,10 +38,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    public function saveFile(FileData $fileData): void
+    public function saveFile(string $bucketId, string $fileId, File $file): void
     {
         $this->checkPath();
-        $destinationFilenameArray = $this->generatePath($fileData);
+        $destinationFilenameArray = $this->generatePath($bucketId, $fileId);
 
         // Create all directories except the root
         $root = $destinationFilenameArray['root'];
@@ -60,7 +58,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         // Move the file into place
-        $src = $fileData->getFile()->getPathname();
+        $src = $file->getPathname();
         $basename = $destinationFilenameArray['basename'];
         $tmp = tempnam($currentDir, 'tmp_'.$basename.'_');
         if ($tmp === false) {
@@ -103,32 +101,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } finally {
             @unlink($tmp);
         }
-    }
-
-    public function getContentUrl(FileData $fileData): string
-    {
-        $filePath = $this->getFilePath($fileData);
-
-        // build binary response
-        $file = file_get_contents($filePath);
-        if ($file === false) {
-            throw new \RuntimeException('Could not read the file: '.$filePath);
-        }
-        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
-
-        // Set the mimetype with the guesser or manually
-        if ($mimeTypeGuesser->isGuesserSupported()) {
-            // Guess the mimetype of the file according to the extension of the file
-            $mimeType = $mimeTypeGuesser->guessMimeType($filePath);
-        } elseif ($fileData->getMimeType()) {
-            // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
-            $mimeType = $fileData->getMimeType();
-        } else {
-            // Set the mimetype of the file manually, in this case for a text file is text/plain
-            $mimeType = 'text/plain';
-        }
-
-        return 'data:'.$mimeType.';base64,'.base64_encode($file);
     }
 
     public function getSumOfFilesizesOfBucket(string $bucketId): int
@@ -237,39 +209,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $numOfFiles;
     }
 
-    public function getBinaryResponse(FileData $fileData): Response
+    public function getBinaryResponse(string $bucketId, string $fileId): Response
     {
-        $filePath = $this->getFilePath($fileData);
+        $filePath = $this->getFilePath($bucketId, $fileId);
 
-        $response = new BinaryFileResponse($filePath);
-        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
-
-        // Set the mimetype with the guesser or manually
-        if ($mimeTypeGuesser->isGuesserSupported()) {
-            // Guess the mimetype of the file according to the extension of the file
-            $response->headers->set('Content-Type', $mimeTypeGuesser->guessMimeType($filePath));
-        } elseif ($fileData->getMimeType()) {
-            // Set the mimetype of the file manually to the already set mimetype if guessing is impossible
-            $response->headers->set('Content-Type', $fileData->getMimeType());
-        } else {
-            // Set the mimetype of the file manually, in this case for a text file is text/plain
-            $response->headers->set('Content-Type', 'text/plain');
-        }
-
-        $filename = $fileData->getFileName();
-
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filename
-        );
-
-        return $response;
+        return new BinaryFileResponse($filePath);
     }
 
-    public function removeFile(FileData $fileData): void
+    public function removeFile(string $bucketId, string $fileId): void
     {
         // Delete the file
-        $path = $this->getFilePath($fileData);
+        $path = $this->getFilePath($bucketId, $fileId);
 
         if (!file_exists($path)) {
             throw new \RuntimeException('File does not exist: '.$path);
@@ -280,13 +230,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    private function generatePath(FileData $fileData): array
+    private function generatePath(string $bucketId, string $fileId): array
     {
         $numOfChars = 2;
         $baseOffset = 24;
 
-        $bucketId = $fileData->getInternalBucketID();
-        $id = $fileData->getIdentifier();
+        $id = $fileId;
         // While we assume UUIDs v7 here, make sure there are no path traversal things possible
         if (str_contains($bucketId, '/') || str_contains($id, '/') || str_contains($bucketId, '.') || str_contains($id, '.')) {
             throw new \RuntimeException('Invalid ID');
@@ -306,8 +255,8 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return ['root' => $destination, 'dirs' => [$bucketId, $folder, $nextFolder], 'basename' => $id, 'path' => $path];
     }
 
-    public function getFilePath(FileData $fileData): string
+    public function getFilePath(string $bucketId, string $fileId): string
     {
-        return $this->generatePath($fileData)['path'];
+        return $this->generatePath($bucketId, $fileId)['path'];
     }
 }

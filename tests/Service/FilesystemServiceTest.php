@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
 
-use Dbp\Relay\BlobBundle\Entity\FileData;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -71,14 +70,12 @@ class FilesystemServiceTest extends WebTestCase
 
     public function testSaveGetRemoveFile()
     {
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setFile($this->getExampleFile());
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+
         $this->assertSame([], $this->getAllPaths());
 
-        $this->fileSystemService->saveFile($fileData);
+        $this->fileSystemService->saveFile($bucketId, $fileId, $this->getExampleFile());
         $this->assertSame([
             '154cc850-ede8-4c10-bff5-4e24f2ef6087',
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9',
@@ -86,7 +83,7 @@ class FilesystemServiceTest extends WebTestCase
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9/11/0192b970-cd6d-726d-a258-a911c5aac1b7',
         ], $this->getAllPaths());
 
-        $this->fileSystemService->removeFile($fileData);
+        $this->fileSystemService->removeFile($bucketId, $fileId);
         $this->assertSame([
             '154cc850-ede8-4c10-bff5-4e24f2ef6087',
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9',
@@ -94,50 +91,28 @@ class FilesystemServiceTest extends WebTestCase
         ], $this->getAllPaths());
     }
 
-    public function testGetBase64Data()
-    {
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
-        $this->fileSystemService->saveFile($fileData);
-
-        $url = $this->fileSystemService->getContentUrl($fileData);
-        $this->assertNotEmpty($url);
-        $this->assertStringContainsString('data:application/pdf;', $url);
-    }
-
     public function testGetBinaryResponse()
     {
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setFile($this->getExampleFile());
-        $fileData->setFileName('foobar.jpg');
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $content = $fileData->getFile()->getContent();
-        $this->fileSystemService->saveFile($fileData);
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
 
-        $response = $this->fileSystemService->getBinaryResponse($fileData);
+        $file = $this->getExampleFile();
+        $content = $file->getContent();
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
+
+        $response = $this->fileSystemService->getBinaryResponse($bucketId, $fileId);
         assert($response instanceof BinaryFileResponse);
         $this->assertSame($content, $response->getFile()->getContent());
-        $this->assertSame('application/pdf', $response->headers->get('Content-Type'));
-        $this->assertSame('attachment; filename=foobar.jpg', $response->headers->get('Content-Disposition'));
         $this->assertSame(200, $response->getStatusCode());
     }
 
     public function testGetBinaryResponseNoExist()
     {
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
-        $fileData->setMimeType('image/jpeg');
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
 
         $this->expectException(\Exception::class);
-        $this->fileSystemService->getBinaryResponse($fileData);
+        $this->fileSystemService->getBinaryResponse($bucketId, $fileId);
     }
 
     public function testGetSumOfFilesizesAndNumberOfFilesOfBucket()
@@ -148,19 +123,15 @@ class FilesystemServiceTest extends WebTestCase
         $this->assertSame(0, $sumSize);
         $this->assertSame(0, $numFiles);
 
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
-        $this->fileSystemService->saveFile($fileData);
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $this->fileSystemService->saveFile($bucketId, $fileId, $this->getExampleFile());
 
         $sumSize = $this->fileSystemService->getSumOfFilesizesOfBucket($bucketId);
         $numFiles = $this->fileSystemService->getNumberOfFilesInBucket($bucketId);
         $this->assertSame(9243, $sumSize);
         $this->assertSame(1, $numFiles);
 
-        $this->fileSystemService->removeFile($fileData);
+        $this->fileSystemService->removeFile($bucketId, $fileId);
 
         $sumSize = $this->fileSystemService->getSumOfFilesizesOfBucket($bucketId);
         $numFiles = $this->fileSystemService->getNumberOfFilesInBucket($bucketId);
@@ -170,54 +141,44 @@ class FilesystemServiceTest extends WebTestCase
 
     public function testRemoveLostFile()
     {
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
-        $this->fileSystemService->saveFile($fileData);
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $this->fileSystemService->saveFile($bucketId, $fileId, $this->getExampleFile());
 
-        $path = $this->fileSystemService->getFilePath($fileData);
+        $path = $this->fileSystemService->getFilePath($bucketId, $fileId);
         unlink($path);
 
         $this->expectException(\Exception::class);
-        $this->fileSystemService->removeFile($fileData);
+        $this->fileSystemService->removeFile($bucketId, $fileId);
     }
 
     public function testFailIfPathDoesntExist()
     {
         // In case the configured path doesn't exist we should fail and not silently create it
-        $fileDataId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
-
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $file = $this->getExampleFile();
         $this->filesystem->remove($this->bucketDir);
 
         $this->expectException(\Exception::class);
-        $this->fileSystemService->saveFile($fileData);
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
     }
 
     public function testFailWithInvalidId()
     {
-        $fileDataId = '0192b970-cd6d-726d-a258-..11c5aac1b7';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-..11c5aac1b7';
+        $file = $this->getExampleFile();
         $this->expectException(\Exception::class);
-        $this->fileSystemService->saveFile($fileData);
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
     }
 
     public function testFailWithInvalidId2()
     {
-        $fileDataId = '';
-        $fileData = new FileData();
-        $fileData->setIdentifier($fileDataId);
-        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
-        $fileData->setFile($this->getExampleFile());
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '';
+        $file = $this->getExampleFile();
         $this->expectException(\Exception::class);
-        $this->fileSystemService->saveFile($fileData);
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
     }
 }
