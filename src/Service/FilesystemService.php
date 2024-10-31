@@ -111,6 +111,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         // build binary response
         $file = file_get_contents($filePath);
+        if ($file === false) {
+            throw new \RuntimeException('Could not read the file: '.$filePath);
+        }
         $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
         // Set the mimetype with the guesser or manually
