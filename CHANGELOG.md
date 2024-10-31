@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.25
+
+* Add a health check for when target path is not existing (in case a mount is not available for example)
+* Fix a race when a file gets deleted while another one gets added
+* Fix a race where a file was added locally even if the mount point was not available
+* Do a temp copy, fsync, rename dance for adding files to make it more atomic
+* Fail if deleting a file fails
+* Adjust for blob API changes (no longer does any mime type guessing and leaves that to blob)
+
 ## v0.1.24
 
 * Fail in case a file is not found when deleting it
