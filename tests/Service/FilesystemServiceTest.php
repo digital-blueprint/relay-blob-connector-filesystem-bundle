@@ -198,4 +198,26 @@ class FilesystemServiceTest extends WebTestCase
         $this->expectException(\Exception::class);
         $this->fileSystemService->saveFile($fileData);
     }
+
+    public function testFailWithInvalidId()
+    {
+        $fileDataId = '0192b970-cd6d-726d-a258-..11c5aac1b7';
+        $fileData = new FileData();
+        $fileData->setIdentifier($fileDataId);
+        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
+        $fileData->setFile($this->getExampleFile());
+        $this->expectException(\Exception::class);
+        $this->fileSystemService->saveFile($fileData);
+    }
+
+    public function testFailWithInvalidId2()
+    {
+        $fileDataId = '';
+        $fileData = new FileData();
+        $fileData->setIdentifier($fileDataId);
+        $fileData->setInternalBucketID('154cc850-ede8-4c10-bff5-4e24f2ef6087');
+        $fileData->setFile($this->getExampleFile());
+        $this->expectException(\Exception::class);
+        $this->fileSystemService->saveFile($fileData);
+    }
 }

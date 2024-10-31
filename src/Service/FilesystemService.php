@@ -246,9 +246,19 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         $bucketId = $fileData->getInternalBucketID();
         $id = $fileData->getIdentifier();
+        // While we assume UUIDs v7 here, make sure there are no path traversal things possible
+        if (str_contains($bucketId, '/') || str_contains($id, '/') || str_contains($bucketId, '.') || str_contains($id, '.')) {
+            throw new \RuntimeException('Invalid ID');
+        }
+
         $folder = substr($id, $baseOffset, $numOfChars);
         $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
         $destination = rtrim($this->configurationService->getPath(), '/');
+
+        // So we never generate a different structure
+        if ($bucketId === '' || $folder === '' || $nextFolder === '') {
+            throw new \RuntimeException('Invalid ID');
+        }
 
         $path = $destination.'/'.$bucketId.'/'.$folder.'/'.$nextFolder.'/'.$id;
 
