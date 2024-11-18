@@ -38,10 +38,10 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    public function saveFile(string $bucketId, string $fileId, File $file): void
+    public function saveFile(string $internalBucketId, string $fileId, File $file): void
     {
         $this->checkPath();
-        $destinationFilenameArray = $this->generatePath($bucketId, $fileId);
+        $destinationFilenameArray = $this->generatePath($internalBucketId, $fileId);
 
         // Create all directories except the root
         $root = $destinationFilenameArray['root'];
@@ -103,18 +103,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    public function getSumOfFilesizesOfBucket(string $bucketId): int
+    public function getSumOfFilesizesOfBucket(string $internalBucketId): int
     {
         // size of all files in the filesystem
         $sumOfFileSizes = 0;
 
         // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$bucketId)) {
+        if (!is_dir($this->configurationService->getPath().'/'.$internalBucketId)) {
             return 0;
         }
 
         /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$bucketId);
+        $subdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId);
         if (!$subdirs) {
             return -1;
         }
@@ -124,7 +124,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             }
 
             /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir);
+            $subsubdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir);
             if (!$subsubdirs) {
                 return -1;
             }
@@ -138,7 +138,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 }
 
                 /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir);
+                $files = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir.'/'.$subsubdir);
                 if (!$files) {
                     return -1;
                 }
@@ -151,7 +151,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                         continue;
                     }
 
-                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir.'/'.$file);
+                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir.'/'.$subsubdir.'/'.$file);
                 }
             }
         }
@@ -159,18 +159,18 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $sumOfFileSizes;
     }
 
-    public function getNumberOfFilesInBucket(string $bucketId): int
+    public function getNumberOfFilesInBucket(string $internalBucketId): int
     {
         // size of all files in the filesystem
         $numOfFiles = 0;
 
         // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$bucketId)) {
+        if (!is_dir($this->configurationService->getPath().'/'.$internalBucketId)) {
             return 0;
         }
 
         /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$bucketId);
+        $subdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId);
         if (!$subdirs) {
             return -1;
         }
@@ -180,7 +180,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
             }
 
             /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir);
+            $subsubdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir);
             if (!$subsubdirs) {
                 return -1;
             }
@@ -194,7 +194,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 }
 
                 /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$bucketId.'/'.$subdir.'/'.$subsubdir);
+                $files = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir.'/'.$subsubdir);
                 if (!$files) {
                     return -1;
                 }
@@ -209,17 +209,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return $numOfFiles;
     }
 
-    public function getBinaryResponse(string $bucketId, string $fileId): Response
+    public function getBinaryResponse(string $internalBucketId, string $fileId): Response
     {
-        $filePath = $this->getFilePath($bucketId, $fileId);
+        $filePath = $this->getFilePath($internalBucketId, $fileId);
 
         return new BinaryFileResponse($filePath);
     }
 
-    public function removeFile(string $bucketId, string $fileId): void
+    public function removeFile(string $internalBucketId, string $fileId): void
     {
         // Delete the file
-        $path = $this->getFilePath($bucketId, $fileId);
+        $path = $this->getFilePath($internalBucketId, $fileId);
 
         if (!file_exists($path)) {
             throw new \RuntimeException('File does not exist: '.$path);
@@ -230,14 +230,14 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    private function generatePath(string $bucketId, string $fileId): array
+    private function generatePath(string $internalBucketId, string $fileId): array
     {
         $numOfChars = 2;
         $baseOffset = 24;
 
         $id = $fileId;
         // While we assume UUIDs v7 here, make sure there are no path traversal things possible
-        if (str_contains($bucketId, '/') || str_contains($id, '/') || str_contains($bucketId, '.') || str_contains($id, '.')) {
+        if (str_contains($internalBucketId, '/') || str_contains($id, '/') || str_contains($internalBucketId, '.') || str_contains($id, '.')) {
             throw new \RuntimeException('Invalid ID');
         }
 
@@ -246,17 +246,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $destination = rtrim($this->configurationService->getPath(), '/');
 
         // So we never generate a different structure
-        if ($bucketId === '' || $folder === '' || $nextFolder === '') {
+        if ($internalBucketId === '' || $folder === '' || $nextFolder === '') {
             throw new \RuntimeException('Invalid ID');
         }
 
-        $path = $destination.'/'.$bucketId.'/'.$folder.'/'.$nextFolder.'/'.$id;
+        $path = $destination.'/'.$internalBucketId.'/'.$folder.'/'.$nextFolder.'/'.$id;
 
-        return ['root' => $destination, 'dirs' => [$bucketId, $folder, $nextFolder], 'basename' => $id, 'path' => $path];
+        return ['root' => $destination, 'dirs' => [$internalBucketId, $folder, $nextFolder], 'basename' => $id, 'path' => $path];
     }
 
-    public function getFilePath(string $bucketId, string $fileId): string
+    public function getFilePath(string $internalBucketId, string $fileId): string
     {
-        return $this->generatePath($bucketId, $fileId)['path'];
+        return $this->generatePath($internalBucketId, $fileId)['path'];
     }
 }
