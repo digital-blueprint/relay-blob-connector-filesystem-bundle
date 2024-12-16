@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.26
+
+* Adjust for blob API changes
+* Test with PHP 8.4
+* Port to phpstan v2
+
 ## v0.1.25
 
 * Add a health check for when target path is not existing (in case a mount is not available for example)
