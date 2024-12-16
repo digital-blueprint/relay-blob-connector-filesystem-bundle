@@ -115,27 +115,39 @@ class FilesystemServiceTest extends WebTestCase
         $this->fileSystemService->getBinaryResponse($bucketId, $fileId);
     }
 
+    public function testHasFile()
+    {
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+
+        $this->assertFalse($this->fileSystemService->hasFile($bucketId, $fileId));
+        $file = $this->getExampleFile();
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
+        $this->assertTrue($this->fileSystemService->hasFile($bucketId, $fileId));
+        $this->fileSystemService->removeFile($bucketId, $fileId);
+        $this->assertFalse($this->fileSystemService->hasFile($bucketId, $fileId));
+    }
+
     public function testGetSumOfFilesizesAndNumberOfFilesOfBucket()
     {
         $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
-        $sumSize = $this->fileSystemService->getSumOfFilesizesOfBucket($bucketId);
-        $numFiles = $this->fileSystemService->getNumberOfFilesInBucket($bucketId);
-        $this->assertSame(0, $sumSize);
+        $numFiles = count([...$this->fileSystemService->listFiles($bucketId)]);
         $this->assertSame(0, $numFiles);
 
         $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
         $this->fileSystemService->saveFile($bucketId, $fileId, $this->getExampleFile());
 
-        $sumSize = $this->fileSystemService->getSumOfFilesizesOfBucket($bucketId);
-        $numFiles = $this->fileSystemService->getNumberOfFilesInBucket($bucketId);
+        $sumSize = 0;
+        foreach ($this->fileSystemService->listFiles($bucketId) as $fileId) {
+            $sumSize += $this->fileSystemService->getFileSize($bucketId, $fileId);
+        }
+        $numFiles = count([...$this->fileSystemService->listFiles($bucketId)]);
         $this->assertSame(9243, $sumSize);
         $this->assertSame(1, $numFiles);
 
         $this->fileSystemService->removeFile($bucketId, $fileId);
 
-        $sumSize = $this->fileSystemService->getSumOfFilesizesOfBucket($bucketId);
-        $numFiles = $this->fileSystemService->getNumberOfFilesInBucket($bucketId);
-        $this->assertSame(0, $sumSize);
+        $numFiles = count([...$this->fileSystemService->listFiles($bucketId)]);
         $this->assertSame(0, $numFiles);
     }
 
@@ -180,5 +192,26 @@ class FilesystemServiceTest extends WebTestCase
         $file = $this->getExampleFile();
         $this->expectException(\Exception::class);
         $this->fileSystemService->saveFile($bucketId, $fileId, $file);
+    }
+
+    public function testListFiles()
+    {
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $file = $this->getExampleFile();
+        $this->assertSame([], [...$this->fileSystemService->listFiles($bucketId)]);
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
+        $this->assertSame([$fileId], [...$this->fileSystemService->listFiles($bucketId)]);
+        $this->fileSystemService->removeFile($bucketId, $fileId);
+        $this->assertSame([], [...$this->fileSystemService->listFiles($bucketId)]);
+    }
+
+    public function testGetFileHash()
+    {
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $file = $this->getExampleFile();
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
+        $this->assertSame('1a3f15c65474074505208b4dc4e13bd652f6a70692debd592ff6a8e9ded15ff3', $this->fileSystemService->getFileHash($bucketId, $fileId));
     }
 }

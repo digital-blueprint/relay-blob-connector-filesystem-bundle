@@ -105,55 +105,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function getSumOfFilesizesOfBucket(string $internalBucketId): int
     {
-        // size of all files in the filesystem
         $sumOfFileSizes = 0;
-
-        // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$internalBucketId)) {
-            return 0;
-        }
-
-        /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId);
-        if (!$subdirs) {
-            return -1;
-        }
-        foreach ($subdirs as $subdir) {
-            if ($subdir === '.' || $subdir === '..') {
-                continue;
-            }
-
-            /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir);
-            if (!$subsubdirs) {
-                return -1;
-            }
-            // check if files other than . and .. are available
-            if (count($subsubdirs) <= 2) {
-                continue;
-            }
-            foreach ($subsubdirs as $subsubdir) {
-                if ($subsubdir === '.' || $subsubdir === '..') {
-                    continue;
-                }
-
-                /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir.'/'.$subsubdir);
-                if (!$files) {
-                    return -1;
-                }
-                // check if files other than . and .. are available
-                if (count($files) <= 2) {
-                    continue;
-                }
-                foreach ($files as $file) {
-                    if ($file === '.' || $file === '..') {
-                        continue;
-                    }
-
-                    $sumOfFileSizes += filesize($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir.'/'.$subsubdir.'/'.$file);
-                }
-            }
+        foreach ($this->listFilePaths($internalBucketId) as $filePath) {
+            $sumOfFileSizes += filesize($filePath);
         }
 
         return $sumOfFileSizes;
@@ -161,49 +115,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function getNumberOfFilesInBucket(string $internalBucketId): int
     {
-        // size of all files in the filesystem
         $numOfFiles = 0;
-
-        // check if directory exists
-        if (!is_dir($this->configurationService->getPath().'/'.$internalBucketId)) {
-            return 0;
-        }
-
-        /* iterate over first level of subdirectories in bucket dir, if no failure */
-        $subdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId);
-        if (!$subdirs) {
-            return -1;
-        }
-        foreach ($subdirs as $subdir) {
-            if ($subdir === '.' || $subdir === '..') {
-                continue;
-            }
-
-            /* iterate over second level of subdirectories in bucket dir, if no failure */
-            $subsubdirs = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir);
-            if (!$subsubdirs) {
-                return -1;
-            }
-            // check if files other than . and .. are available
-            if (count($subsubdirs) <= 2) {
-                continue;
-            }
-            foreach ($subsubdirs as $subsubdir) {
-                if ($subsubdir === '.' || $subsubdir === '..') {
-                    continue;
-                }
-
-                /* iterate over all files if some are available and if no failure */
-                $files = scandir($this->configurationService->getPath().'/'.$internalBucketId.'/'.$subdir.'/'.$subsubdir);
-                if (!$files) {
-                    return -1;
-                }
-                // check if files other than . and .. are available
-                if (count($files) <= 2) {
-                    continue;
-                }
-                $numOfFiles += (count($files) - 2);
-            }
+        foreach ($this->listFilePaths($internalBucketId) as $filePath) {
+            ++$numOfFiles;
         }
 
         return $numOfFiles;
@@ -258,5 +172,86 @@ class FilesystemService implements DatasystemProviderServiceInterface
     public function getFilePath(string $internalBucketId, string $fileId): string
     {
         return $this->generatePath($internalBucketId, $fileId)['path'];
+    }
+
+    public function hasFile(string $internalBucketId, string $fileId): bool
+    {
+        return file_exists($this->getFilePath($internalBucketId, $fileId));
+    }
+
+    private function listFilePaths(string $internalBucketId): iterable
+    {
+        $this->checkPath();
+        $path = $this->configurationService->getPath();
+        $bucketPath = $path.DIRECTORY_SEPARATOR.$internalBucketId;
+
+        if (!is_dir($bucketPath)) {
+            return [];
+        }
+
+        $subdirs = scandir($bucketPath);
+        if ($subdirs === false) {
+            throw new \RuntimeException();
+        }
+
+        foreach ($subdirs as $subdir) {
+            if ($subdir === '.' || $subdir === '..') {
+                continue;
+            }
+
+            $subdirPath = $bucketPath.DIRECTORY_SEPARATOR.$subdir;
+            $subsubdirs = scandir($subdirPath);
+            if ($subsubdirs === false) {
+                throw new \RuntimeException();
+            }
+
+            foreach ($subsubdirs as $subsubdir) {
+                if ($subsubdir === '.' || $subsubdir === '..') {
+                    continue;
+                }
+
+                $subsubdirPath = $subdirPath.DIRECTORY_SEPARATOR.$subsubdir;
+                $files = scandir($subsubdirPath);
+                if ($files === false) {
+                    throw new \RuntimeException();
+                }
+
+                foreach ($files as $file) {
+                    if ($file === '.' || $file === '..') {
+                        continue;
+                    }
+
+                    yield $subsubdirPath.DIRECTORY_SEPARATOR.$file;
+                }
+            }
+        }
+    }
+
+    public function listFiles(string $internalBucketId): iterable
+    {
+        foreach ($this->listFilePaths($internalBucketId) as $filePath) {
+            yield basename($filePath);
+        }
+    }
+
+    public function getFileSize(string $internalBucketId, string $fileId): int
+    {
+        $res = filesize($this->getFilePath($internalBucketId, $fileId));
+        if ($res === false) {
+            throw new \RuntimeException();
+        }
+
+        return $res;
+    }
+
+    public function getFileHash(string $internalBucketId, string $fileId): string
+    {
+        $path = $this->getFilePath($internalBucketId, $fileId);
+        $res = \hash_file('sha256', $path);
+        if ($res === false) {
+            throw new \RuntimeException();
+        }
+
+        return $res;
     }
 }
