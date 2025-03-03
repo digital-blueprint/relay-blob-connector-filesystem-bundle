@@ -11,6 +11,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 readonly class FilesystemService implements DatasystemProviderServiceInterface
 {
+    private mixed $backupFile;
+
     public function __construct(
         private ConfigurationService $configurationService)
     {
@@ -256,5 +258,30 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
                 yield $baseNameOnly ? $dirIterator->getFilename() : $dirIterator->getPathname();
             }
         }
+    }
+
+    public function openMetadataBackup(): bool
+    {
+        $ret = fopen(rtrim($this->configurationService->getPath(), '/').'/metadata-backup.json', 'w');
+
+        if ($ret !== false) {
+            $this->backupFile = $ret;
+        }
+
+        return $ret !== false;
+    }
+
+    public function appendToMetadataBackup(string $item): bool
+    {
+        $ret = fwrite($this->backupFile, $item);
+
+        return $ret !== false;
+    }
+
+    public function closeMetadataBackup(): bool
+    {
+        $ret = fclose($this->backupFile);
+
+        return $ret !== false;
     }
 }
