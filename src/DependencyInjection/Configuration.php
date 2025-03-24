@@ -19,6 +19,10 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('path')
                         ->defaultValue('blobFiles')
                     ->end()
+                    ->booleanNode('create_path')
+                        ->info('If path should be created if it doesn\'t exist')
+                        ->defaultFalse()
+                    ->end()
                 ->end()
             ->end();
 

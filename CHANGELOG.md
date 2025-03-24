@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* config: add 'create_path' boolean to enable creating of the storage path in case it doesn't exist
+
 ## v0.1.26
 
 * Adjust for blob API changes

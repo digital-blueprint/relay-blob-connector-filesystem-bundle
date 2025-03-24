@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,12 +23,24 @@ class FilesystemService implements DatasystemProviderServiceInterface
     }
 
     /**
-     * Check if the configured target path is usable.
+     * Check if the configured target path is usable, and create it if not.
      */
     public function checkPath(): void
     {
         $path = $this->configurationService->getPath();
+
+        // Doesn't exist and isn't a broken symlink
+        if (!file_exists($path) && !is_link($path)) {
+            if ($this->configurationService->getCreatePath()) {
+                $filesystem = new Filesystem();
+                $filesystem->mkdir($path);
+            }
+        }
+
         if (!file_exists($path)) {
+            if (is_link($path)) {
+                throw new \RuntimeException("$path is a broken link");
+            }
             throw new \RuntimeException("$path does not exist");
         } elseif (!is_dir($path)) {
             throw new \RuntimeException("$path is not a directory");

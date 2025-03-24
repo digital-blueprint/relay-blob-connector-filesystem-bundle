@@ -25,4 +25,9 @@ class ConfigurationService
     {
         return $this->config['path'];
     }
+
+    public function getCreatePath(): bool
+    {
+        return $this->config['create_path'];
+    }
 }

@@ -31,7 +31,7 @@ class FilesystemServiceTest extends WebTestCase
         $this->filesystem->mkdir($this->bucketDir);
         $this->filesystem->mkdir($this->uploadDir);
 
-        $config = ['path' => $this->bucketDir];
+        $config = ['path' => $this->bucketDir, 'create_path' => false];
         $this->configurationService = new ConfigurationService();
         $this->configurationService->setConfig($config);
         $this->fileSystemService = new FilesystemService($this->configurationService);
@@ -173,6 +173,16 @@ class FilesystemServiceTest extends WebTestCase
         $this->filesystem->remove($this->bucketDir);
 
         $this->expectException(\Exception::class);
+        $this->fileSystemService->saveFile($bucketId, $fileId, $file);
+    }
+
+    public function testCreateIfConfigured()
+    {
+        $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
+        $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
+        $file = $this->getExampleFile();
+        $this->filesystem->remove($this->bucketDir);
+        $this->configurationService->setConfig(['path' => $this->bucketDir, 'create_path' => true]);
         $this->fileSystemService->saveFile($bucketId, $fileId, $file);
     }
 
