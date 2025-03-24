@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.27
+
 * config: add 'create_path' boolean to enable creating of the storage path in case it doesn't exist
 * Drop support for PHP 8.1
 * Drop support for api-platform 3.2/3.3
