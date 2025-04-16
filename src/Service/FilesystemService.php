@@ -13,9 +13,12 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
 {
     private mixed $backupFile;
 
+    private string $backupFileName;
+
     public function __construct(
         private ConfigurationService $configurationService)
     {
+        $this->backupFileName = 'metadata-backup.jsonl';
     }
 
     /**
@@ -260,9 +263,9 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    public function openMetadataBackup(): bool
+    public function openMetadataBackup(string $interalBucketId): bool
     {
-        $ret = fopen(rtrim($this->configurationService->getPath(), '/').'/metadata-backup.json', 'w');
+        $ret = fopen(rtrim($this->configurationService->getPath(), '/').'/'.$interalBucketId.'/'.$this->backupFileName, 'w');
 
         if ($ret !== false) {
             $this->backupFile = $ret;
@@ -278,10 +281,24 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
         return $ret !== false;
     }
 
-    public function closeMetadataBackup(): bool
+    public function closeMetadataBackup(string $interalBucketId): bool
     {
         $ret = fclose($this->backupFile);
 
         return $ret !== false;
+    }
+
+    public function getMetadataBackupFileHash(string $intBucketId): ?string
+    {
+        $ret = hash_file('sha256', rtrim($this->configurationService->getPath(), '/').'/'.$intBucketId.'/'.$this->backupFileName);
+        if ($ret === false) {
+            return null;
+        }
+        return $ret;
+    }
+
+    public function getMetadataBackupFileRef(string $intBucketId): ?string
+    {
+        return rtrim($this->configurationService->getPath(), '/').'/'.$intBucketId.'/'.$this->backupFileName;
     }
 }
