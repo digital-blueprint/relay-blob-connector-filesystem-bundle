@@ -17,6 +17,8 @@
         "symfony/string": "^6.4"
     },
     "require-dev": {
+        "ext-pdo_sqlite": "*",
+        "captainhook/captainhook": "^5.25",
         "friendsofphp/php-cs-fixer": "^3.50",
         "phpstan/phpstan": "^2.0.0",
         "phpstan/phpstan-phpunit": "^2.0.0",
@@ -25,8 +27,7 @@
         "symfony/browser-kit": "^6.4",
         "symfony/http-client": "^6.4",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/phpunit-bridge": "^7.0.4",
-        "ext-pdo_sqlite": "*"
+        "symfony/phpunit-bridge": "^7.0.4"
     },
     "autoload": {
         "psr-4": {
@@ -45,6 +46,7 @@
         }
     },
     "scripts": {
+        "post-autoload-dump": "vendor/bin/captainhook install -f",
         "test": [
             "@php vendor/bin/phpunit"
         ],
