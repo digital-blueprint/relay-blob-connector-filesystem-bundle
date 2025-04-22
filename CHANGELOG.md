@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.1.28
+
+* Remove dependency on api-platform
+
 ## v0.1.27
 
 * config: add 'create_path' boolean to enable creating of the storage path in case it doesn't exist
