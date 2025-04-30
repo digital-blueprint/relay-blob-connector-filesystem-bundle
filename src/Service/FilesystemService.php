@@ -10,22 +10,17 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
 
-class FilesystemService implements DatasystemProviderServiceInterface
+readonly class FilesystemService implements DatasystemProviderServiceInterface
 {
-    /**
-     * @var ConfigurationService
-     */
-    private $configurationService;
-
-    public function __construct(ConfigurationService $configurationService)
+    public function __construct(
+        private ConfigurationService $configurationService)
     {
-        $this->configurationService = $configurationService;
     }
 
     /**
-     * Check if the configured target path is usable, and create it if not.
+     * Check if the configured target path is usable and create it if not.
      */
-    public function checkPath(): void
+    public function ensurePath(): string
     {
         $path = $this->configurationService->getPath();
 
@@ -49,11 +44,13 @@ class FilesystemService implements DatasystemProviderServiceInterface
         } elseif (!is_writable($path)) {
             throw new \RuntimeException("$path is not writable");
         }
+
+        return $path;
     }
 
     public function saveFile(string $internalBucketId, string $fileId, File $file): void
     {
-        $this->checkPath();
+        $this->ensurePath();
         $destinationFilenameArray = $this->generatePath($internalBucketId, $fileId);
 
         // Create all directories except the root
@@ -61,7 +58,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $dirs = $destinationFilenameArray['dirs'];
         $currentDir = $root;
         foreach ($dirs as $dir) {
-            $currentDir .= '/'.$dir;
+            $currentDir .= DIRECTORY_SEPARATOR.$dir;
             if (!file_exists($currentDir)) {
                 // In case something else created the dir in the meantime, mkdir will fail, so check again afterward
                 if (mkdir($currentDir) !== true && !file_exists($currentDir)) {
@@ -104,7 +101,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
                 fclose($handle);
             }
 
-            // Finally move to the target
+            // Finally, move to the target
             $renamed = rename($tmp, $target);
             if (!$renamed) {
                 throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $tmp, $target));
@@ -157,31 +154,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    private function generatePath(string $internalBucketId, string $fileId): array
-    {
-        $numOfChars = 2;
-        $baseOffset = 24;
-
-        $id = $fileId;
-        // While we assume UUIDs v7 here, make sure there are no path traversal things possible
-        if (str_contains($internalBucketId, '/') || str_contains($id, '/') || str_contains($internalBucketId, '.') || str_contains($id, '.')) {
-            throw new \RuntimeException('Invalid ID');
-        }
-
-        $folder = substr($id, $baseOffset, $numOfChars);
-        $nextFolder = substr($id, $baseOffset + $numOfChars, $numOfChars);
-        $destination = rtrim($this->configurationService->getPath(), '/');
-
-        // So we never generate a different structure
-        if ($internalBucketId === '' || $folder === '' || $nextFolder === '') {
-            throw new \RuntimeException('Invalid ID');
-        }
-
-        $path = $destination.'/'.$internalBucketId.'/'.$folder.'/'.$nextFolder.'/'.$id;
-
-        return ['root' => $destination, 'dirs' => [$internalBucketId, $folder, $nextFolder], 'basename' => $id, 'path' => $path];
-    }
-
     public function getFilePath(string $internalBucketId, string $fileId): string
     {
         return $this->generatePath($internalBucketId, $fileId)['path'];
@@ -192,59 +164,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return file_exists($this->getFilePath($internalBucketId, $fileId));
     }
 
-    private function listFilePaths(string $internalBucketId): iterable
-    {
-        $this->checkPath();
-        $path = $this->configurationService->getPath();
-        $bucketPath = $path.DIRECTORY_SEPARATOR.$internalBucketId;
-
-        if (!is_dir($bucketPath)) {
-            return [];
-        }
-
-        $subdirs = scandir($bucketPath);
-        if ($subdirs === false) {
-            throw new \RuntimeException();
-        }
-
-        foreach ($subdirs as $subdir) {
-            if ($subdir === '.' || $subdir === '..') {
-                continue;
-            }
-
-            $subdirPath = $bucketPath.DIRECTORY_SEPARATOR.$subdir;
-            $subsubdirs = scandir($subdirPath);
-            if ($subsubdirs === false) {
-                throw new \RuntimeException();
-            }
-
-            foreach ($subsubdirs as $subsubdir) {
-                if ($subsubdir === '.' || $subsubdir === '..') {
-                    continue;
-                }
-
-                $subsubdirPath = $subdirPath.DIRECTORY_SEPARATOR.$subsubdir;
-                $files = scandir($subsubdirPath);
-                if ($files === false) {
-                    throw new \RuntimeException();
-                }
-
-                foreach ($files as $file) {
-                    if ($file === '.' || $file === '..') {
-                        continue;
-                    }
-
-                    yield $subsubdirPath.DIRECTORY_SEPARATOR.$file;
-                }
-            }
-        }
-    }
-
     public function listFiles(string $internalBucketId): iterable
     {
-        foreach ($this->listFilePaths($internalBucketId) as $filePath) {
-            yield basename($filePath);
-        }
+        return $this->listFilePaths($internalBucketId, true);
     }
 
     public function getFileSize(string $internalBucketId, string $fileId): int
@@ -266,5 +188,69 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
 
         return $res;
+    }
+
+    private function generatePath(string $internalBucketId, ?string $fileId = null): array
+    {
+        $numOfChars = 2;
+        $baseOffset = 24;
+
+        // While we assume UUIDs v7 here, make sure there are no path traversal things possible
+        if (str_contains($fileId, DIRECTORY_SEPARATOR) || str_contains($fileId, '.')) {
+            throw new \RuntimeException('Invalid file ID');
+        }
+
+        $folder = substr($fileId, $baseOffset, $numOfChars);
+        $nextFolder = substr($fileId, $baseOffset + $numOfChars, $numOfChars);
+
+        // So we never generate a different structure
+        if ($folder === '' || $nextFolder === '') {
+            throw new \RuntimeException('Invalid file ID');
+        }
+
+        $rootPath = $this->getRootPath();
+        $path = $this->getBucketPath($internalBucketId, $rootPath).DIRECTORY_SEPARATOR.$folder.
+            DIRECTORY_SEPARATOR.$nextFolder.DIRECTORY_SEPARATOR.$fileId;
+
+        return [
+            'root' => $rootPath,
+            'dirs' => [$internalBucketId, $folder, $nextFolder],
+            'basename' => $fileId,
+            'path' => $path,
+        ];
+    }
+
+    private function getRootPath(): string
+    {
+        return rtrim($this->configurationService->getPath(), DIRECTORY_SEPARATOR);
+    }
+
+    private function getBucketPath(string $internalBucketId, ?string $rootPath = null): string
+    {
+        if (str_contains($internalBucketId, DIRECTORY_SEPARATOR)
+            || str_contains($internalBucketId, '.') || $internalBucketId === '') {
+            throw new \RuntimeException('Invalid internal bucket ID');
+        }
+        $rootPath ??= $this->getRootPath();
+
+        return $rootPath.DIRECTORY_SEPARATOR.$internalBucketId;
+    }
+
+    private function listFilePaths(string $internalBucketId, bool $baseNameOnly = false): iterable
+    {
+        $bucketPath = $this->getBucketPath($internalBucketId);
+        if (!is_dir($bucketPath)) {
+            return [];
+        }
+
+        $recursiveDirectoryIterator = new \RecursiveDirectoryIterator($bucketPath,
+            \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_SELF);
+
+        /** @var \RecursiveDirectoryIterator $dirIterator */
+        foreach (new \RecursiveIteratorIterator($recursiveDirectoryIterator) as $dirIterator) {
+            if ($dirIterator->isFile()) {
+                yield $baseNameOnly ? $dirIterator->getFilename() : $dirIterator->getPathname();
+            }
+        }
     }
 }

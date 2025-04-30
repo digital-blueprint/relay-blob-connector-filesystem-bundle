@@ -6,12 +6,9 @@ namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 class ConfigurationService
 {
-    /**
-     * @var array
-     */
-    private $config = [];
+    private array $config = [];
 
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         $this->config = $config;
     }

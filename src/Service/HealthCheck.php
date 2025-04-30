@@ -8,13 +8,10 @@ use Dbp\Relay\CoreBundle\HealthCheck\CheckInterface;
 use Dbp\Relay\CoreBundle\HealthCheck\CheckOptions;
 use Dbp\Relay\CoreBundle\HealthCheck\CheckResult;
 
-class HealthCheck implements CheckInterface
+readonly class HealthCheck implements CheckInterface
 {
-    private FilesystemService $api;
-
-    public function __construct(FilesystemService $api)
+    public function __construct(private FilesystemService $filesystemService)
     {
-        $this->api = $api;
     }
 
     public function getName(): string
@@ -40,7 +37,7 @@ class HealthCheck implements CheckInterface
     public function check(CheckOptions $options): array
     {
         return [
-            $this->checkMethod('Check if the filesystem path is usable', [$this->api, 'checkPath']),
+            $this->checkMethod('Check if the filesystem path is usable', [$this->filesystemService, 'ensurePath']),
         ];
     }
 }
