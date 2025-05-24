@@ -283,22 +283,22 @@
         },
         {
             "name": "dbp/relay-blob-bundle",
-            "version": "v0.1.71",
+            "version": "v0.1.177",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-bundle.git",
-                "reference": "f01ffa8e24ae6c7b8ff01dfa8a7b94f8e6adc6ee"
+                "reference": "0952c33087477a34283f25d7b3e270d1607dc247"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/f01ffa8e24ae6c7b8ff01dfa8a7b94f8e6adc6ee",
-                "reference": "f01ffa8e24ae6c7b8ff01dfa8a7b94f8e6adc6ee",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-bundle/zipball/0952c33087477a34283f25d7b3e270d1607dc247",
+                "reference": "0952c33087477a34283f25d7b3e270d1607dc247",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^3.4 || ^4.1",
-                "dbp/relay-blob-library": "^0.2.0",
-                "dbp/relay-core-bundle": "^0.1.210",
+                "dbp/relay-blob-library": "^0.3.3",
+                "dbp/relay-core-bundle": "^0.1.212",
                 "doctrine/dbal": "^3.8 || ^4.0",
                 "doctrine/doctrine-bundle": "^2.13",
                 "doctrine/doctrine-migrations-bundle": "^3.3",
@@ -309,6 +309,7 @@
                 "kekos/multipart-form-data-parser": "^1.1",
                 "nyholm/psr7": "^1.8",
                 "php": ">=8.2",
+                "psr/http-message": "^2.0",
                 "psr/log": "^1.0 || ^2 || ^3",
                 "ramsey/uuid": "^4.7",
                 "ramsey/uuid-doctrine": "^2.0",
@@ -330,6 +331,7 @@
             "require-dev": {
                 "ext-curl": "*",
                 "friendsofphp/php-cs-fixer": "^3.50",
+                "guzzlehttp/psr7": "^2.7",
                 "phpstan/phpstan": "^2.0",
                 "phpstan/phpstan-phpunit": "^2.0",
                 "phpstan/phpstan-symfony": "^2.0",
@@ -355,35 +357,40 @@
             "description": "A bundle for file-serving, persisting and managing",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-blob-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.71"
+                "source": "https://github.com/digital-blueprint/relay-blob-bundle/tree/v0.1.177"
             },
-            "time": "2025-04-16T12:49:04+00:00"
+            "time": "2025-05-23T08:31:49+00:00"
         },
         {
             "name": "dbp/relay-blob-library",
-            "version": "v0.2.14",
+            "version": "v0.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-blob-library.git",
-                "reference": "1c025e0cb26a87a901757d71a1ba1f6df1709d3c"
+                "reference": "e22cd274fbe9df687ae3d7ff4b2799b60f1d146c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-library/zipball/1c025e0cb26a87a901757d71a1ba1f6df1709d3c",
-                "reference": "1c025e0cb26a87a901757d71a1ba1f6df1709d3c",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-blob-library/zipball/e22cd274fbe9df687ae3d7ff4b2799b60f1d146c",
+                "reference": "e22cd274fbe9df687ae3d7ff4b2799b60f1d146c",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.0",
+                "guzzlehttp/psr7": "^2.7",
                 "php": ">=8.2",
                 "psr/http-message": "^1.0 || ^2.0",
+                "symfony/config": "^6.4 || ^7.2",
+                "symfony/dependency-injection": "^6.4 || ^7.2",
+                "symfony/http-foundation": "^6.4 || ^7",
                 "web-token/jwt-library": "^3.3 || ^4.0.4"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.50",
                 "phpstan/phpstan": "^2.0.0",
                 "phpstan/phpstan-phpunit": "^2.0.0",
+                "phpstan/phpstan-symfony": "^2.0",
                 "phpunit/phpunit": "^10.3"
             },
             "type": "library",
@@ -396,18 +403,12 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "authors": [
-                {
-                    "name": "Patrizio Bekerle",
-                    "homepage": "https://github.com/pbek"
-                }
-            ],
-            "description": "PHP helper library for interaction with the relay-blob-bundle.",
+            "description": "PHP helper library for interaction with the dbp/relay-blob-bundle.",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-blob-library/issues",
-                "source": "https://github.com/digital-blueprint/relay-blob-library/tree/v0.2.14"
+                "source": "https://github.com/digital-blueprint/relay-blob-library/tree/v0.3.5"
             },
-            "time": "2025-04-08T11:47:29+00:00"
+            "time": "2025-05-23T17:27:11+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
