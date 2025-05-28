@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update blob: Adapt to interface changes of DatasystemProviderServiceInterface (accept \SplFileInfo on save, return
+StreamInterface for files, instead of Symfony Response object)
 - Re-implement listFiles without growing memory usage
 
 ## v0.1.28

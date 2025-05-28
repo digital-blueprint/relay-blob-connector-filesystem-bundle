@@ -8,7 +8,6 @@ use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FilesystemServiceTest extends WebTestCase
@@ -48,9 +47,8 @@ class FilesystemServiceTest extends WebTestCase
         $tempFile = $filesystem->tempnam($this->uploadDir, 'blob_fs_');
         $file = dirname(__FILE__).DIRECTORY_SEPARATOR.'test.pdf';
         $this->assertTrue(copy($file, $tempFile), 'Copy testfile went wrong');
-        $uploadedFile = new File($tempFile, true);
 
-        return $uploadedFile;
+        return new File($tempFile, true);
     }
 
     private function getAllPaths(): array
@@ -91,28 +89,27 @@ class FilesystemServiceTest extends WebTestCase
         ], $this->getAllPaths());
     }
 
-    public function testGetBinaryResponse()
+    public function testAddFileAndGetFileStream()
     {
         $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
         $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
 
         $file = $this->getExampleFile();
-        $content = $file->getContent();
+        $fileContents = $file->getContent(); // get it before saveFile
+
         $this->fileSystemService->saveFile($bucketId, $fileId, $file);
 
-        $response = $this->fileSystemService->getBinaryResponse($bucketId, $fileId);
-        assert($response instanceof BinaryFileResponse);
-        $this->assertSame($content, $response->getFile()->getContent());
-        $this->assertSame(200, $response->getStatusCode());
+        $fileStream = $this->fileSystemService->getFileStream($bucketId, $fileId);
+        $this->assertSame($fileContents, $fileStream->getContents());
     }
 
-    public function testGetBinaryResponseNoExist()
+    public function testGetFileStreamNoExist()
     {
         $bucketId = '154cc850-ede8-4c10-bff5-4e24f2ef6087';
         $fileId = '0192b970-cd6d-726d-a258-a911c5aac1b7';
 
         $this->expectException(\Exception::class);
-        $this->fileSystemService->getBinaryResponse($bucketId, $fileId);
+        $this->fileSystemService->getFileStream($bucketId, $fileId);
     }
 
     public function testHasFile()

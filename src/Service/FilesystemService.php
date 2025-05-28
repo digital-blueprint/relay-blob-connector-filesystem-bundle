@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Service;
 
 use Dbp\Relay\BlobBundle\Service\DatasystemProviderServiceInterface;
+use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\Response;
 
 readonly class FilesystemService implements DatasystemProviderServiceInterface
 {
@@ -48,7 +47,7 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
         return $path;
     }
 
-    public function saveFile(string $internalBucketId, string $fileId, File $file): void
+    public function saveFile(string $internalBucketId, string $fileId, \SplFileInfo $file): void
     {
         $this->ensurePath();
         $destinationFilenameArray = $this->generatePath($internalBucketId, $fileId);
@@ -62,54 +61,55 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
             if (!file_exists($currentDir)) {
                 // In case something else created the dir in the meantime, mkdir will fail, so check again afterward
                 if (mkdir($currentDir) !== true && !file_exists($currentDir)) {
-                    throw new \RuntimeException("Unable to create $currentDir");
+                    throw new \RuntimeException("Unable to create directory $currentDir");
                 }
             }
         }
 
         // Move the file into place
-        $src = $file->getPathname();
         $basename = $destinationFilenameArray['basename'];
-        $tmp = tempnam($currentDir, 'tmp_'.$basename.'_');
-        if ($tmp === false) {
+        $tmpFilePath = tempnam($currentDir, 'tmp_'.$basename.'_');
+        if ($tmpFilePath === false) {
             throw new \RuntimeException("Unable to create temp file in $currentDir");
         }
         // tempnam() can fall back to the system temp dir, which we don't want
-        if (realpath(dirname($tmp)) !== realpath($currentDir)) {
-            @unlink($tmp);
+        if (realpath(dirname($tmpFilePath)) !== realpath($currentDir)) {
+            @unlink($tmpFilePath);
             throw new \RuntimeException("Unable to create temp file in $currentDir");
         }
-        $target = $destinationFilenameArray['path'];
 
         // Move the file to a temp file in the same dir
-        $renamed = rename($src, $tmp);
-        if (!$renamed) {
-            throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $src, $target));
+        $srcFilePath = $file->getRealPath();
+        if ($srcFilePath === false) {
+            throw new \RuntimeException('File to save does not exist: '.$file->getPathname());
         }
-        try {
-            @chmod($tmp, 0o666 & ~umask());
+        if (rename($srcFilePath, $tmpFilePath) === false) {
+            throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $srcFilePath, $tmpFilePath));
+        }
 
-            $handle = fopen($tmp, 'r');
-            if ($handle === false) {
-                throw new \RuntimeException(sprintf('Could not open the file "%s".', $tmp));
+        try {
+            @chmod($tmpFilePath, 0o666 & ~umask());
+
+            $tmpFileResource = fopen($tmpFilePath, 'r');
+            if ($tmpFileResource === false) {
+                throw new \RuntimeException(sprintf('Could not open the file "%s" for reading.', $tmpFilePath));
             }
             try {
-                if (fsync($handle) === false) {
-                    throw new \RuntimeException(sprintf('Could not synchronise the file "%s".', $tmp));
+                if (fsync($tmpFileResource) === false) {
+                    throw new \RuntimeException(sprintf('Could not synchronise the file "%s".', $tmpFilePath));
                 }
             } finally {
-                fclose($handle);
+                fclose($tmpFileResource);
             }
 
             // Finally, move to the target
-            $renamed = rename($tmp, $target);
-            if (!$renamed) {
-                throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $tmp, $target));
+            $target = $destinationFilenameArray['path'];
+            if (false === rename($tmpFilePath, $target)) {
+                throw new \RuntimeException(sprintf('Could not move the file "%s" to "%s".', $tmpFilePath, $target));
             }
-
-            // fsync() in PHP doesn't support directories, so if we crash after this the client might never know
+            // fsync() in PHP doesn't support directories, so if we crash after this, the client might never know
         } finally {
-            @unlink($tmp);
+            @unlink($tmpFilePath);
         }
     }
 
@@ -133,11 +133,15 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
         return $numOfFiles;
     }
 
-    public function getBinaryResponse(string $internalBucketId, string $fileId): Response
+    public function getFileStream(string $internalBucketId, string $fileId): StreamInterface
     {
         $filePath = $this->getFilePath($internalBucketId, $fileId);
+        $fileResource = @fopen($filePath, 'r');
+        if ($fileResource === false) {
+            throw new \RuntimeException("Could not open the file $filePath for reading");
+        }
 
-        return new BinaryFileResponse($filePath);
+        return Utils::streamFor($fileResource);
     }
 
     public function removeFile(string $internalBucketId, string $fileId): void
