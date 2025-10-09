@@ -9,8 +9,9 @@ use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-readonly class FilesystemService implements DatasystemProviderServiceInterface
+class FilesystemService implements DatasystemProviderServiceInterface
 {
+    /** @var resource|null */
     private mixed $backupFile;
 
     private string $backupFileName;
@@ -18,6 +19,7 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
     public function __construct(
         private ConfigurationService $configurationService)
     {
+        $this->backupFile = null;
         $this->backupFileName = 'metadata-backup.jsonl';
     }
 
@@ -294,6 +296,7 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
         if ($ret === false) {
             return null;
         }
+
         return $ret;
     }
 
