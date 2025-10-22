@@ -296,11 +296,12 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $ret = fgets($this->backupFile);
 
         if (!$ret && !feof($this->backupFile)) {
-            throw new \RuntimeException("Could not read line from metadata backup!");
+            throw new \RuntimeException('Could not read line from metadata backup!');
         }
 
         return $ret;
     }
+
     public function hasNextItemInMetadataBackup(): bool
     {
         return feof($this->backupFile);
