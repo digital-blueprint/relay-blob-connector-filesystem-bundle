@@ -265,9 +265,17 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
-    public function openMetadataBackup(string $interalBucketId): bool
+    public function openMetadataBackup(string $interalBucketId, string $mode): bool
     {
-        $ret = fopen(rtrim($this->configurationService->getPath(), '/').'/'.$interalBucketId.'/'.$this->backupFileName, 'w');
+        if ($mode !== 'r' && $mode !== 'w') {
+            throw new \RuntimeException("mode $mode is not supported, only r and w are supported");
+        }
+        $path = rtrim($this->configurationService->getPath(), '/');
+        if (!is_dir($path) || !is_dir($path.'/'.$interalBucketId.'/')) {
+            return false;
+        }
+
+        $ret = fopen($path.'/'.$interalBucketId.'/'.$this->backupFileName, $mode);
 
         if ($ret !== false) {
             $this->backupFile = $ret;
@@ -281,6 +289,21 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $ret = fwrite($this->backupFile, $item);
 
         return $ret !== false;
+    }
+
+    public function retrieveItemFromMetadataBackup(): string|false
+    {
+        $ret = fgets($this->backupFile);
+
+        if (!$ret && !feof($this->backupFile)) {
+            throw new \RuntimeException("Could not read line from metadata backup!");
+        }
+
+        return $ret;
+    }
+    public function hasNextItemInMetadataBackup(): bool
+    {
+        return feof($this->backupFile);
     }
 
     public function closeMetadataBackup(string $interalBucketId): bool
