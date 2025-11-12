@@ -16,11 +16,14 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     private string $backupFileName;
 
+    private string $oldBackupFileName;
+
     public function __construct(
         private ConfigurationService $configurationService)
     {
         $this->backupFile = null;
         $this->backupFileName = 'metadata-backup.jsonl';
+        $this->oldBackupFileName = 'old-'.time().'-metadata-backup.jsonl';
     }
 
     /**
@@ -270,12 +273,22 @@ class FilesystemService implements DatasystemProviderServiceInterface
         if ($mode !== 'r' && $mode !== 'w') {
             throw new \RuntimeException("mode $mode is not supported, only r and w are supported");
         }
-        $path = rtrim($this->configurationService->getPath(), '/');
-        if (!is_dir($path) || !is_dir($path.'/'.$interalBucketId.'/')) {
+        $path = $this->getRootPath();
+        if (!is_dir($path) || !is_dir($path.DIRECTORY_SEPARATOR.$interalBucketId.DIRECTORY_SEPARATOR)) {
             return false;
         }
 
-        $ret = fopen($path.'/'.$interalBucketId.'/'.$this->backupFileName, $mode);
+        $metadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
+        $oldMetadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->oldBackupFileName;
+
+        if (file_exists($metadataBackupPath)) {
+            $ret = rename($metadataBackupPath, $oldMetadataBackupPath);
+            if ($ret === false) {
+                throw new \RuntimeException('cannot rename metadata backup file!');
+            }
+        }
+
+        $ret = fopen($metadataBackupPath, $mode);
 
         if ($ret !== false) {
             $this->backupFile = $ret;
@@ -311,12 +324,21 @@ class FilesystemService implements DatasystemProviderServiceInterface
     {
         $ret = fclose($this->backupFile);
 
+        $oldMetadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->oldBackupFileName;
+
+        if (file_exists($oldMetadataBackupPath)) {
+            $ret = unlink($oldMetadataBackupPath);
+            if ($ret === false) {
+                throw new \RuntimeException("cannot delete old metadata backup file $oldMetadataBackupPath !");
+            }
+        }
+
         return $ret !== false;
     }
 
     public function getMetadataBackupFileHash(string $intBucketId): ?string
     {
-        $ret = hash_file('sha256', rtrim($this->configurationService->getPath(), '/').'/'.$intBucketId.'/'.$this->backupFileName);
+        $ret = hash_file('sha256', $this->getBucketPath($intBucketId).DIRECTORY_SEPARATOR.$this->backupFileName);
         if ($ret === false) {
             return null;
         }
@@ -326,6 +348,6 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
     public function getMetadataBackupFileRef(string $intBucketId): ?string
     {
-        return rtrim($this->configurationService->getPath(), '/').'/'.$intBucketId.'/'.$this->backupFileName;
+        return $this->getBucketPath($intBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
     }
 }
