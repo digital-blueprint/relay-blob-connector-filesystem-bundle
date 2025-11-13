@@ -1,6 +1,7 @@
 # Changelog
 
-## Unreleased
+## v0.1.30
+- Lock file maintenance
 
 ## v0.1.29
 
