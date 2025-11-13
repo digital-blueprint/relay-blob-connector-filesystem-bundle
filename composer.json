@@ -7,7 +7,7 @@
         "php": ">=8.2",
         "ext-json": "*",
         "dbp/relay-blob-bundle": "^0.1.78",
-        "dbp/relay-core-bundle": "^v0.1.153",
+        "dbp/relay-core-bundle": "^v0.1.224",
         "guzzlehttp/psr7": "^2.7",
         "psr/http-message": "^2.0",
         "symfony/config": "^6.4",
