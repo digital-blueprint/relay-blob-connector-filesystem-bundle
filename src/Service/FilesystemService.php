@@ -281,7 +281,7 @@ class FilesystemService implements DatasystemProviderServiceInterface
         $metadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
         $oldMetadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->oldBackupFileName;
 
-        if (file_exists($metadataBackupPath)) {
+        if ($mode === 'w' && file_exists($metadataBackupPath)) {
             $ret = rename($metadataBackupPath, $oldMetadataBackupPath);
             if ($ret === false) {
                 throw new \RuntimeException('cannot rename metadata backup file!');
@@ -320,16 +320,30 @@ class FilesystemService implements DatasystemProviderServiceInterface
         return feof($this->backupFile);
     }
 
-    public function closeMetadataBackup(string $interalBucketId): bool
+    public function closeMetadataBackup(string $interalBucketId, bool $restoreOldBackup = false): bool
     {
         $ret = fclose($this->backupFile);
 
+        $metadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
         $oldMetadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->oldBackupFileName;
 
-        if (file_exists($oldMetadataBackupPath)) {
-            $ret = unlink($oldMetadataBackupPath);
+        if ($restoreOldBackup) {
+            if (file_exists($metadataBackupPath)) {
+                $ret = unlink($metadataBackupPath);
+                if ($ret === false) {
+                    throw new \RuntimeException("cannot delete metadata backup file $oldMetadataBackupPath !");
+                }
+            }
+            $ret = rename($oldMetadataBackupPath, $metadataBackupPath);
             if ($ret === false) {
-                throw new \RuntimeException("cannot delete old metadata backup file $oldMetadataBackupPath !");
+                throw new \RuntimeException('cannot rename metadata backup file!');
+            }
+        } else {
+            if (file_exists($oldMetadataBackupPath)) {
+                $ret = unlink($oldMetadataBackupPath);
+                if ($ret === false) {
+                    throw new \RuntimeException("cannot delete old metadata backup file $oldMetadataBackupPath !");
+                }
             }
         }
 
