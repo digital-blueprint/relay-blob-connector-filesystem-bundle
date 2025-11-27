@@ -9,11 +9,21 @@ use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-readonly class FilesystemService implements DatasystemProviderServiceInterface
+class FilesystemService implements DatasystemProviderServiceInterface
 {
+    /** @var resource|null */
+    private mixed $backupFile;
+
+    private string $backupFileName;
+
+    private string $oldBackupFileName;
+
     public function __construct(
         private ConfigurationService $configurationService)
     {
+        $this->backupFile = null;
+        $this->backupFileName = 'metadata-backup.jsonl';
+        $this->oldBackupFileName = 'old-'.time().'-metadata-backup.jsonl';
     }
 
     /**
@@ -256,5 +266,102 @@ readonly class FilesystemService implements DatasystemProviderServiceInterface
                 yield $baseNameOnly ? $dirIterator->getFilename() : $dirIterator->getPathname();
             }
         }
+    }
+
+    public function openMetadataBackup(string $interalBucketId, string $mode): bool
+    {
+        if ($mode !== 'r' && $mode !== 'w') {
+            throw new \RuntimeException("mode $mode is not supported, only r and w are supported");
+        }
+        $path = $this->getRootPath();
+        if (!is_dir($path) || !is_dir($path.DIRECTORY_SEPARATOR.$interalBucketId.DIRECTORY_SEPARATOR)) {
+            return false;
+        }
+
+        $metadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
+        $oldMetadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->oldBackupFileName;
+
+        if ($mode === 'w' && file_exists($metadataBackupPath)) {
+            $ret = rename($metadataBackupPath, $oldMetadataBackupPath);
+            if ($ret === false) {
+                throw new \RuntimeException('cannot rename metadata backup file!');
+            }
+        }
+
+        $ret = fopen($metadataBackupPath, $mode);
+
+        if ($ret !== false) {
+            $this->backupFile = $ret;
+        }
+
+        return $ret !== false;
+    }
+
+    public function appendToMetadataBackup(string $item): bool
+    {
+        $ret = fwrite($this->backupFile, $item);
+
+        return $ret !== false;
+    }
+
+    public function retrieveItemFromMetadataBackup(): string|false
+    {
+        $ret = fgets($this->backupFile);
+
+        if (!$ret && !feof($this->backupFile)) {
+            throw new \RuntimeException('Could not read line from metadata backup!');
+        }
+
+        return $ret;
+    }
+
+    public function hasNextItemInMetadataBackup(): bool
+    {
+        return feof($this->backupFile);
+    }
+
+    public function closeMetadataBackup(string $interalBucketId, bool $restoreOldBackup = false): bool
+    {
+        $ret = fclose($this->backupFile);
+
+        $metadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
+        $oldMetadataBackupPath = $this->getBucketPath($interalBucketId).DIRECTORY_SEPARATOR.$this->oldBackupFileName;
+
+        if ($restoreOldBackup) {
+            if (file_exists($metadataBackupPath)) {
+                $ret = unlink($metadataBackupPath);
+                if ($ret === false) {
+                    throw new \RuntimeException("cannot delete metadata backup file $oldMetadataBackupPath !");
+                }
+            }
+            $ret = rename($oldMetadataBackupPath, $metadataBackupPath);
+            if ($ret === false) {
+                throw new \RuntimeException('cannot rename metadata backup file!');
+            }
+        } else {
+            if (file_exists($oldMetadataBackupPath)) {
+                $ret = unlink($oldMetadataBackupPath);
+                if ($ret === false) {
+                    throw new \RuntimeException("cannot delete old metadata backup file $oldMetadataBackupPath !");
+                }
+            }
+        }
+
+        return $ret !== false;
+    }
+
+    public function getMetadataBackupFileHash(string $intBucketId): ?string
+    {
+        $ret = hash_file('sha256', $this->getBucketPath($intBucketId).DIRECTORY_SEPARATOR.$this->backupFileName);
+        if ($ret === false) {
+            return null;
+        }
+
+        return $ret;
+    }
+
+    public function getMetadataBackupFileRef(string $intBucketId): ?string
+    {
+        return $this->getBucketPath($intBucketId).DIRECTORY_SEPARATOR.$this->backupFileName;
     }
 }
