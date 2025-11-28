@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Add `appendToMetadataBackup`, `openMetadataBackup`, `retrieveItemFromMetadataBackup`, `hasNextItemInMetadataBackup`, `closeMetadataBackup`, `getMetadataBackupFileHash` and `getMetadataBackupFileRef` to enable metadata backups for the filesystem connector.
+
 ## v0.1.30
 - Lock file maintenance
 
