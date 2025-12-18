@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.2.0
 - Add `appendToMetadataBackup`, `openMetadataBackup`, `retrieveItemFromMetadataBackup`, `hasNextItemInMetadataBackup`, `closeMetadataBackup`, `getMetadataBackupFileHash` and `getMetadataBackupFileRef` to enable metadata backups for the filesystem connector.
 
 ## v0.1.30
