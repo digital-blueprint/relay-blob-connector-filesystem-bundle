@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1
+- Add support for Symfony 7
+- Allow blob-bundle v0.2
+
 ## v0.2.0
 - Add `appendToMetadataBackup`, `openMetadataBackup`, `retrieveItemFromMetadataBackup`, `hasNextItemInMetadataBackup`, `closeMetadataBackup`, `getMetadataBackupFileHash` and `getMetadataBackupFileRef` to enable metadata backups for the filesystem connector.
 
