@@ -161,10 +161,9 @@ class FilesystemService implements DatasystemProviderServiceInterface
 
         if (!file_exists($path)) {
             throw new \RuntimeException('File does not exist: '.$path);
-        } else {
-            if (unlink($path) === false) {
-                throw new \RuntimeException('Could not delete the file: '.$path);
-            }
+        }
+        if (unlink($path) === false) {
+            throw new \RuntimeException('Could not delete the file: '.$path);
         }
     }
 
