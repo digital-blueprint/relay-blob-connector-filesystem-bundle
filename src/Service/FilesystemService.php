@@ -126,8 +126,15 @@ class FilesystemService implements DatasystemProviderServiceInterface
     public function getSumOfFilesizesOfBucket(string $internalBucketId): int
     {
         $sumOfFileSizes = 0;
+        $numOfFiles = 1; // off by one doesnt matter but saved one unnecessary clearstatcache()
         foreach ($this->listFilePaths($internalBucketId) as $filePath) {
             $sumOfFileSizes += filesize($filePath);
+
+            // clear cache every 10Mio files, should save around 200MB RAM each time its run
+            ++$numOfFiles;
+            if ($numOfFiles % 10000000 === 0) {
+                clearstatcache();
+            }
         }
 
         return $sumOfFileSizes;
