@@ -1,5 +1,7 @@
 # Changelog
 
+- Add support for guzzlehttp/psr7 v3
+
 ## v0.2.1
 - Add support for Symfony 7
 - Allow blob-bundle v0.2
