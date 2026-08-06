@@ -1,5 +1,7 @@
 # Changelog
 
+## v0.2.2
+
 - Add support for guzzlehttp/psr7 v3
 
 ## v0.2.1
