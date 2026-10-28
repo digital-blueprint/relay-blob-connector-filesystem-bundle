@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add `dbp:relay:blob-connector-filesystem:cleanup-empty-directories` to recursively remove empty storage directories, with a `--dry-run` option.
+
 ## v0.2.2
 
 - Add support for guzzlehttp/psr7 v3

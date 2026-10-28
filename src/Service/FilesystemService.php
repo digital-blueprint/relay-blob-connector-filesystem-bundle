@@ -123,6 +123,52 @@ class FilesystemService implements DatasystemProviderServiceInterface
         }
     }
 
+    public function removeEmptyDirectories(bool $dryRun = false): int
+    {
+        $root = $this->configurationService->getPath();
+        if (!is_dir($root)) {
+            throw new \RuntimeException("$root is not a directory");
+        }
+
+        // Visit children first so newly empty parents can be removed in the same pass.
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        $removed = 0;
+        $plannedRemovals = [];
+        foreach ($iterator as $entry) {
+            if ($entry->isLink() || !$entry->isDir()) {
+                continue;
+            }
+
+            $path = $entry->getPathname();
+            $contents = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
+            $empty = true;
+            foreach ($contents as $child) {
+                // During a dry run, treat previously selected children as already removed.
+                if (!isset($plannedRemovals[$child->getPathname()])) {
+                    $empty = false;
+                    break;
+                }
+            }
+            unset($contents);
+            if (!$empty) {
+                continue;
+            }
+
+            if ($dryRun) {
+                $plannedRemovals[$path] = true;
+            } elseif (!@rmdir($path)) {
+                // Only rmdir() is used, so newly added files are never deleted.
+                throw new \RuntimeException("Unable to remove directory $path");
+            }
+            ++$removed;
+        }
+
+        return $removed;
+    }
+
     public function getSumOfFilesizesOfBucket(string $internalBucketId): int
     {
         $sumOfFileSizes = 0;

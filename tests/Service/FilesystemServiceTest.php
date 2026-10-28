@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BlobConnectorFilesystemBundle\Tests\Service;
 
+use Dbp\Relay\BlobConnectorFilesystemBundle\Command\CleanupEmptyDirectoriesCommand;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\ConfigurationService;
 use Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -87,6 +90,92 @@ class FilesystemServiceTest extends WebTestCase
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9',
             '154cc850-ede8-4c10-bff5-4e24f2ef6087/a9/11',
         ], $this->getAllPaths());
+    }
+
+    public function testRemoveEmptyDirectories(): void
+    {
+        $this->filesystem->mkdir([
+            $this->bucketDir.'/empty/aa/bb',
+            $this->bucketDir.'/occupied/cc/dd',
+            $this->bucketDir.'/occupied/empty',
+            $this->bucketDir.'/hidden',
+        ]);
+        $this->filesystem->dumpFile($this->bucketDir.'/occupied/cc/dd/file', 'data');
+        $this->filesystem->dumpFile($this->bucketDir.'/hidden/.keep', '');
+
+        $this->assertSame(4, $this->fileSystemService->removeEmptyDirectories());
+        $this->assertSame([
+            'hidden',
+            'hidden/.keep',
+            'occupied',
+            'occupied/cc',
+            'occupied/cc/dd',
+            'occupied/cc/dd/file',
+        ], $this->getAllPaths());
+        $this->assertSame('data', file_get_contents($this->bucketDir.'/occupied/cc/dd/file'));
+        $this->assertSame(0, $this->fileSystemService->removeEmptyDirectories());
+        $this->assertDirectoryExists($this->bucketDir);
+    }
+
+    public function testRemoveEmptyDirectoriesDryRun(): void
+    {
+        $this->filesystem->mkdir([
+            $this->bucketDir.'/empty/aa/bb',
+            $this->bucketDir.'/occupied/empty',
+        ]);
+        $this->filesystem->dumpFile($this->bucketDir.'/occupied/.keep', '');
+        $paths = $this->getAllPaths();
+
+        $this->assertSame(4, $this->fileSystemService->removeEmptyDirectories(true));
+        $this->assertSame($paths, $this->getAllPaths());
+        $this->assertSame(4, $this->fileSystemService->removeEmptyDirectories());
+    }
+
+    public function testRemoveEmptyDirectoriesPreservesSymlinks(): void
+    {
+        $this->filesystem->mkdir($this->uploadDir.'/empty');
+        $this->filesystem->mkdir($this->bucketDir.'/links');
+        $this->assertTrue(symlink($this->uploadDir, $this->bucketDir.'/links/external'));
+        $this->assertTrue(symlink($this->tempDir.'/missing', $this->bucketDir.'/links/broken'));
+
+        $this->assertSame(0, $this->fileSystemService->removeEmptyDirectories(true));
+        $this->assertSame(0, $this->fileSystemService->removeEmptyDirectories());
+        $this->assertDirectoryExists($this->uploadDir.'/empty');
+        $this->assertTrue(is_link($this->bucketDir.'/links/external'));
+        $this->assertTrue(is_link($this->bucketDir.'/links/broken'));
+    }
+
+    public function testCleanupEmptyDirectoriesCommand(): void
+    {
+        $this->filesystem->mkdir($this->bucketDir.'/empty/child');
+        $tester = new CommandTester(new CleanupEmptyDirectoriesCommand($this->fileSystemService));
+
+        $this->assertSame(Command::SUCCESS, $tester->execute([]));
+        $this->assertStringContainsString('Removed 2 empty directories.', $tester->getDisplay());
+        $this->assertSame([], $this->getAllPaths());
+        $this->assertDirectoryExists($this->bucketDir);
+    }
+
+    public function testCleanupEmptyDirectoriesCommandDryRun(): void
+    {
+        $this->filesystem->mkdir($this->bucketDir.'/empty/child');
+        $paths = $this->getAllPaths();
+        $tester = new CommandTester(new CleanupEmptyDirectoriesCommand($this->fileSystemService));
+
+        $this->assertSame(Command::SUCCESS, $tester->execute(['--dry-run' => true]));
+        $this->assertStringContainsString('Would remove 2 empty directories.', $tester->getDisplay());
+        $this->assertSame($paths, $this->getAllPaths());
+    }
+
+    public function testCleanupEmptyDirectoriesCommandWithMissingRoot(): void
+    {
+        $this->filesystem->remove($this->bucketDir);
+        $this->configurationService->setConfig(['path' => $this->bucketDir, 'create_path' => true]);
+        $tester = new CommandTester(new CleanupEmptyDirectoriesCommand($this->fileSystemService));
+
+        $this->assertSame(Command::FAILURE, $tester->execute([]));
+        $this->assertStringContainsString('is not a directory', $tester->getDisplay());
+        $this->assertDirectoryDoesNotExist($this->bucketDir);
     }
 
     public function testAddFileAndGetFileStream()

@@ -1,4 +1,9 @@
 services:
+  Dbp\Relay\BlobConnectorFilesystemBundle\Command\:
+    resource: '../../Command'
+    autowire: true
+    autoconfigure: true
+
   Dbp\Relay\BlobConnectorFilesystemBundle\Service\FilesystemService:
     autowire: true
     autoconfigure: true
