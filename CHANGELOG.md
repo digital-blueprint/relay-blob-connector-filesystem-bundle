@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.3
+
 - Add `dbp:relay:blob-connector-filesystem:cleanup-empty-directories` to recursively remove empty storage directories, with a `--dry-run` option.
 
 ## v0.2.2
